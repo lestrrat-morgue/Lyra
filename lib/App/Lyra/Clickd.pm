@@ -16,12 +16,11 @@ sub run {
     my $self = shift;
 
     my $runner = Plack::Runner->new(server => 'Twiggy', env => 'deployment');
-    $runner->parse_options( 
+    $runner->parse_options( @{ $self->extra_argv } );
     $runner->run( 
         Lyra::Server::Click->new(
             dbh_dsn => $self->dbh_dsn
         )->psgi_app
-    )
     );
 }
 
