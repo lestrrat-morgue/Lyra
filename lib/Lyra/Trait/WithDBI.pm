@@ -1,5 +1,5 @@
 package Lyra::Trait::WithDBI;
-use Any::Moose '::Role';
+use Moose::Role;
 use AnyEvent::DBI;
 use namespace::autoclean;
 

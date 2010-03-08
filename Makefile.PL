@@ -3,7 +3,7 @@ use inc::Module::Install;
 name 'Lyra';
 all_from 'lib/Lyra.pm';
 
-requires 'Any::Moose';
+requires 'Moose';
 requires 'AnyEvent';
 requires 'AnyEvent::DBI';
 requires 'Cache::Memcached::AnyEvent';

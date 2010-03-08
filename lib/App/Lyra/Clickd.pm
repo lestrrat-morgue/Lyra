@@ -1,10 +1,10 @@
 package App::Lyra::Clickd;
-use Any::Moose;
+use Moose;
 use Lyra::Server::Click;
 use Plack::Runner;
 use namespace::autoclean;
 
-with any_moose('X::Getopt');
+with 'MooseX::Getopt';
 
 has dbh_dsn => (
     is => 'ro',

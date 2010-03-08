@@ -1,5 +1,5 @@
 package Lyra::Trait::WithMemcached;
-use Any::Moose '::Role';
+use Moose::Role;
 use Cache::Memcached::AnyEvent;
 use namespace::autoclean;
 

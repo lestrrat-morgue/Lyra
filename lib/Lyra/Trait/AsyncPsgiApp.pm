@@ -1,5 +1,5 @@
 package Lyra::Trait::AsyncPsgiApp;
-use Any::Moose '::Role';
+use Moose::Role;
 use namespace::autoclean;
 
 requires 'process';

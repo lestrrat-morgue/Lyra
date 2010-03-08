@@ -1,5 +1,5 @@
 package Lyra::Server::Click;
-use Any::Moose;
+use Moose;
 use URI;
 use AnyEvent;
 use namespace::autoclean;

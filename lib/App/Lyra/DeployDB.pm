@@ -1,8 +1,8 @@
 package App::Lyra::DeployDB;
-use Any::Moose;
+use Moose;
 use namespace::clean;
 
-with any_moose('::Getopt');
+with 'MooseX::Getopt';
 
 sub run {
     my $self = shift;

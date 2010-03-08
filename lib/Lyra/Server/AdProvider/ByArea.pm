@@ -1,5 +1,5 @@
 package Lyra::Server::AdProvider::ByArea;
-use Any::Moose;
+use Moose;
 use namespace::autoclean;
 
 with qw(Lyra::Trait::AsyncPsgiApp Lyra::Trait::WithMemcached);
