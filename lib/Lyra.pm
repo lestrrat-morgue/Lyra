@@ -8,6 +8,27 @@ __END__
 
 Lyra - XXX
 
+=head1 SETUP
+
+=head2 INSTALL BUILD PREREQUISITES
+
+=over 4
+
+=item Module::Install
+
+=item Module::Install::Bundle::LocalLib (0.00006)
+
+=back
+
+=head2 CREATE EXTLIB
+
+    perl Makefile.PL
+    make bundle_local_lib
+
+=head2 RUN!
+
+    ./bin/lyra_clickd --dbh_dsn=dbi:mysql:....
+
 =head1 lyra_clickd
 
 Records a click.

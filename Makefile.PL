@@ -15,6 +15,8 @@ requires 'Plack';
 requires 'Twiggy';
 requires 'Server::Starter';
 
+build_requires 'Module::Install::Bundle::LocalLib';
+
 # if you want to deploy the database schema
 recommends 'DBIx::Class';
 
