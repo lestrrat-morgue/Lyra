@@ -4,6 +4,7 @@ name 'Lyra';
 all_from 'lib/Lyra.pm';
 
 requires 'Moose';
+requires 'MooseX::Getopt';
 requires 'AnyEvent';
 requires 'AnyEvent::DBI';
 requires 'Cache::Memcached::AnyEvent';
