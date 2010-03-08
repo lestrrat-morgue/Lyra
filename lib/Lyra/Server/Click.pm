@@ -12,15 +12,22 @@ has ad_id_query_key => (
     default => 'ad',
 );
 
+# has log_storage => (
+#     is => 'ro',
+#     isa => 'Log::Server::Click::Storage',
+#     handles => { 'store' => 'log_click' }
+# );
+
 sub process {
     my ($self, $start_response, $env) = @_;
 
-    # This is the CV that gets called at the end
+    # Stuff that gets logged at the end goes here
     my %log_info = (
         remote_addr => $env->{REMOTE_ADDR},
         query       => $env->{QUERY_STRING},
     );
 
+    # This is the CV that gets called at the end
     my $cv = AE::cv {
         my ($status, $header, $content) = $_[0]->recv;
         _respond_cb($start_response, $status, $header, $content);
@@ -32,7 +39,6 @@ sub process {
         undef $header;
         undef $content;
     };
-
 
     # check for some conditions
     my ($status, @headers, $content);
