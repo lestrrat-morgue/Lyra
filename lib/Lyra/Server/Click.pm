@@ -1,7 +1,8 @@
 package Lyra::Server::Click;
 use Moose;
-use URI;
 use AnyEvent;
+use Lyra::Extlib;
+use URI;
 use namespace::autoclean;
 
 with qw(Lyra::Trait::WithMemcached Lyra::Trait::WithDBI Lyra::Trait::AsyncPsgiApp);
