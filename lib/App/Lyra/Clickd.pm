@@ -4,7 +4,7 @@ use Lyra::Server::Click;
 use Plack::Runner;
 use namespace::autoclean;
 
-with any_moose('::Getopt');
+with any_moose('X::Getopt');
 
 has dbh_dsn => (
     is => 'ro',
@@ -13,12 +13,15 @@ has dbh_dsn => (
 );
 
 sub run {
+    my $self = shift;
+
     my $runner = Plack::Runner->new(server => 'Twiggy', env => 'deployment');
     $runner->parse_options( 
     $runner->run( 
         Lyra::Server::Click->new(
             dbh_dsn => $self->dbh_dsn
         )->psgi_app
+    )
     );
 }
 
