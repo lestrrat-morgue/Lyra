@@ -37,3 +37,23 @@ sub _build_cache {
 }
 
 1;
+
+__END__
+
+=head1 NAME 
+
+Lyra::Trait::Memcached - Adds Cache::Memcached::AnyEvent Access To Your Object
+
+=head1 SYNOPSIS
+
+    package MyObject;
+    use Moose;
+    with 'Lyra::Trait::Memcached';
+
+    sub whatever {
+        my $self = shift;
+
+        $self->cache->get($key, $cb);
+    }
+
+=cut

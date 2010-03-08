@@ -38,3 +38,22 @@ sub _build_dbh {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+Lyra::Trait::WithDBI - Adds Asynchronous DBI Access
+
+=head1 SYNOPSIS
+
+    package MyClass;
+    use Moose;
+    with 'Lyra::Trait::WithDBI';
+
+    sub whatever {
+        my $self = shift;
+        $self->cache->exec($sql, @binds, $cb);
+    }
+
+=cut
