@@ -26,7 +26,6 @@ features(
         -default => 0,
         recommends ('DBIx::Class'),
         recommends ('DBIx::Class::TimeStamp'),
-        recommends ('MooseX::Getopt'),
     ]
 );
 
