@@ -1,4 +1,4 @@
-package Lyra::Server::AdProvider::ByArea;
+package Lyra::Server::AdEngine::ByArea;
 use Moose;
 use namespace::autoclean;
 

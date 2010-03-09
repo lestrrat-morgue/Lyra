@@ -1,6 +1,6 @@
-package App::Lyra::AdProvider::ByArea;
+package App::Lyra::AdEngine::ByArea;
 use Moose;
-use Lyra::Server::AdProvider::ByArea;
+use Lyra::Server::AdEngine::ByArea;
 use namespace::autoclean;
 
 with 'Lyra::Trait::PsgiAppCmd';
@@ -17,7 +17,7 @@ has dbh_dsn => (
 
 sub build_app {
     my $self = shift;
-    Lyra::Server::AdProvider::ByArea->new(
+    Lyra::Server::AdEngine::ByArea->new(
         dbh_dsn => $self->dbh_dsn
     )->psgi_app;
 }
