@@ -18,8 +18,15 @@ requires 'Server::Starter';
 build_requires 'Module::Install::Bundle::LocalLib';
 
 # if you want to deploy the database schema
-recommends 'DBIx::Class';
+features(
+    'Automatic DB Deployment' => [
+        -default => 0,
+        recommends ('DBIx::Class'),
+        recommends ('MooseX::Getopt'),
+    ]
+);
 
+auto_install;
 auto_set_repository;
 bundle_local_lib;
 
