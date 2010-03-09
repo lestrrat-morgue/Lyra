@@ -4,7 +4,7 @@ use warnings;
 use base qw(DBIx::Class);
 
 __PACKAGE__->mk_classdata(engine => 'InnoDB');
-__PACKAGE__->mk_classdata(charset => 'UTF-8');
+__PACKAGE__->mk_classdata(charset => 'UTF8');
 
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;

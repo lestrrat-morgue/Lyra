@@ -1,15 +1,17 @@
-package Clicking::Schema;
+package Lyra::Schema;
 use strict;
 use warnings;
 use base qw(DBIx::Class::Schema);
 
 __PACKAGE__->load_namespaces();
 
+1;
+
 __END__
 
 =head1 NAME 
 
-Clicking::Schema - Database Schemas For Clicking
+Lyra::Schema - Database Schemas For Lyra
 
 =head1 DESCRIPTION
 
