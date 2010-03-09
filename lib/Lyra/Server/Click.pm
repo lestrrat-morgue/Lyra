@@ -55,8 +55,8 @@ sub process {
 
     # if we got here, then we're just going to redirect to the
     # landing page. 
-    my $query = URI->new('http://dummy/?' . ($ENV{QUERY_STRING} || ''))->query_form;
-    my $ad_id = $query->{ $self->ad_id_query_key };
+    my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
+    my $ad_id = $query{ $self->ad_id_query_key };
 
     $self->load_ad( $ad_id, $cv );
 }
@@ -105,7 +105,7 @@ sub load_ad_from_db {
     my ($self, $final_cv, $ad_id) = @_;
 
     $self->dbh->exec(
-        "SELECT landing_uri FROM table WHERE id = ?",
+        "SELECT landing_uri FROM click WHERE id = ?",
         $ad_id,
         sub { _load_ad_from_db_cb( $self, $final_cv, $ad_id, $_[1] ) }
     );
