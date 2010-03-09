@@ -2,6 +2,8 @@ package Lyra;
 use strict;
 our $VERSION = '0.00001';
 
+1;
+
 __END__
 
 =head1 NAME
