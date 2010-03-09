@@ -1,6 +1,6 @@
-package App::Lyra::Clickd;
+package App::Lyra::AdProvider::ByArea;
 use Moose;
-use Lyra::Server::Click;
+use Lyra::Server::AdProvider::ByArea;
 use namespace::autoclean;
 
 with 'Lyra::Trait::PsgiAppCmd';
@@ -17,7 +17,7 @@ has dbh_dsn => (
 
 sub build_app {
     my $self = shift;
-    Lyra::Server::Click->new(
+    Lyra::Server::AdProvider::ByArea->new(
         dbh_dsn => $self->dbh_dsn
     )->psgi_app;
 }
@@ -25,4 +25,3 @@ sub build_app {
 __PACKAGE__->meta->make_immutable();
 
 1;
-
