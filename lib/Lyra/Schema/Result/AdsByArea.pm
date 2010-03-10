@@ -4,7 +4,7 @@ use warnings;
 use base qw(Lyra::Schema::Result);
 
 __PACKAGE__->load_components( qw(TimeStamp Core) );
-__PACKAGE__->table('ads_by_area');
+__PACKAGE__->table('lyra_ads_by_area');
 __PACKAGE__->add_columns(
     id => {
         data_type => 'CHAR',
