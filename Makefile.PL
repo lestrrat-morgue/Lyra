@@ -27,6 +27,11 @@ features(
         -default => 0,
         recommends ('DBIx::Class'),
         recommends ('DBIx::Class::TimeStamp'),
+    ],
+    'File Based Storage For Logs' => [
+        -default => 0,
+        recommends ('AnyEvent::AIO'),
+        recommends ('IO::AIO'),
     ]
 );
 
