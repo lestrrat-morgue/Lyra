@@ -14,6 +14,7 @@ requires 'namespace::autoclean';
 requires 'Plack';
 requires 'Twiggy';
 requires 'Server::Starter';
+requires 'Math::Round';
 
 build_requires 'Module::Install::Bundle::LocalLib';
 
