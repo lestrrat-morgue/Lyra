@@ -32,3 +32,27 @@ sub run {
 }
 
 1;
+
+__END__
+
+=head1 NAME
+
+App::Lyra::DeployDB - Deploy Database Schema
+
+=head1 SYNOPSIS
+
+    use App::Lyra::DeployDB;
+
+    App::Lyra::DeployDB->new_with_options->run();
+
+    # or explicitly
+    App::Lyra::DeployDB->new(
+        dsn => 'dbi:mysql:dbname=...',
+        username => '...',
+        password => '...',
+        source => \@monikers, # if you want to selectively deploy
+        drop_table => $bool, # if you want to add a DROP TABLE before CREATE TABLe
+        schema_class => 'Lyra::Schema', # if you want to use a different schema
+    )->run();
+
+=cut
