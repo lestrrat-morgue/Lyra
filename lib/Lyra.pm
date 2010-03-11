@@ -27,6 +27,10 @@ Lyra - XXX
     perl Makefile.PL
     make bundle_local_lib
 
+=head2 CREATE DATABASE
+
+    ./bin/lyra_deploydb --dsn=... --username=.... --password=...
+
 =head2 RUN!
 
     ./bin/lyra_clickd --dbh_dsn=dbi:mysql:....
