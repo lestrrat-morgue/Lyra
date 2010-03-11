@@ -10,11 +10,14 @@ my $store = Lyra::Server::Click::Storage::File->new(
 
 # XXX - これだけじゃテストになってません！
 
-my $cv = AE::cv;
+my $filename;
+my $cv = AE::cv { unlink $filename };
 foreach my $i (1..100) {
-    warn "starting $i";
     $cv->begin();
-    $store->store(undef, sub { warn "callback"; $cv->end });
+    $store->store(undef, sub {
+        $filename ||= shift;
+        $cv->end;
+    });
 }
 
 $cv->recv;
