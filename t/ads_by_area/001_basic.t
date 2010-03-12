@@ -16,6 +16,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     is( $engine->_convert_to_degree(
             $engine->_convert_to_msec($lng)
         ), $lng, 'convert coordinate 2' );
-    
+
+    # XXX $engine->_calc_range 
 }
 
