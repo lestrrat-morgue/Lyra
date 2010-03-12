@@ -13,11 +13,12 @@ has ad_id_query_key => (
     default => 'ad',
 );
 
-# has log_storage => (
-#     is => 'ro',
-#     isa => 'Log::Server::Click::Storage',
-#     handles => { 'store' => 'log_click' }
-# );
+has log_storage => (
+    is => 'ro',
+    handles => {
+        log_click => 'store',
+    },
+);
 
 sub process {
     my ($self, $start_response, $env) = @_;
