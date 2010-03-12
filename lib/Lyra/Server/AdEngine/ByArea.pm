@@ -1,4 +1,7 @@
 package Lyra::Server::AdEngine::ByArea;
+use AnyEvent;
+use Lyra::Extlib;
+use URI;
 use Math::Round;
 use Math::Trig;
 use Moose;
@@ -30,21 +33,44 @@ has range => => (
 sub process {
     my ($self, $start_response, $env) = @_;
 
+    # This is the CV that gets called at the end
+    my $cv = AE::cv {
+        my ($status, $header, $content) = $_[0]->recv;
+        _respond_cb($start_response, $status, $header, $content);
+        #if ($status eq 302) { # which is success for us
+        #    $self->log_click( \%log_info );
+        #}
+        #undef %log_info;
+        undef $status;
+        undef $header;
+        undef $content;
+    };
+
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
     my $lng   = $query{ $self->lng_query_key };
     my $range = $self->_calc_range($lat, $lng, $self->range);
 
     $self->dbh->exec(
-        qq{SELECT id,title,content WHERE lyra_ads_by_area status = 1 AND
-            MBRContains(GeomFromText('LineString(? ?,? ?'),location)},
-        ( @{$range->{end}}, @{$range->{start}} ),
+        q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
+            AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
+        @{ $range->{end}   },
+        @{ $range->{start} },
         sub {
+            use Data::Dumper;
+            print Dumper @_;
             # ここで処理
- 
             # ログ取りのためのディスパッチ
         }
     );
+}
+
+sub _respond_cb {
+    my ($start_response, $status, $headers, $content) = @_;
+    # immediately return and close connection.
+    my $writer = $start_response->( [ $status, $headers ] );
+    $writer->writer($content) if $content;
+    $writer->close;
 }
 
 sub _calc_range {
