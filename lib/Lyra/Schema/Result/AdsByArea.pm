@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use base qw(Lyra::Schema::Result);
 
-__PACKAGE__->mk_classdata(engine => 'MyISAM');
+__PACKAGE__->engine('MyISAM');
 __PACKAGE__->load_components( qw(TimeStamp Core) );
 __PACKAGE__->table('lyra_ads_by_area');
 __PACKAGE__->add_columns(
