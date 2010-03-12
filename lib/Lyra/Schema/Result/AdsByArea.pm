@@ -38,4 +38,15 @@ __PACKAGE__->add_columns(
 );
 __PACKAGE__->add_unique_constraint( 'unique_id' => [ 'id' ] );
 
+sub sqlt_deploy_hook {
+    my ($self, $sqlt_table) = @_;
+
+    $self->next::method($sqlt_table);
+    $sqlt_table->add_index(
+        type => 'SPATIAL',
+        name => 'lyra_ads_by_area_location_idx',
+        fields => [ 'location' ]
+    );
+}
+
 1;
