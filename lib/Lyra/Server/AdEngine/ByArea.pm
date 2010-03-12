@@ -9,15 +9,39 @@ with qw(Lyra::Trait::AsyncPsgiApp Lyra::Trait::WithMemcached Lyra::Trait::WithDB
 # 2. DBに登録してあるカラム（RTree-Index）に作成した条件（矩形）でSELECT
 # 3. SELECTした結果をXMLなりJSで返す
 
+has lat_query_key => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'lat',
+);
+
+has lng_query_key => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'lng',
+);
+
+has range => => (
+    is => 'ro',
+    isa => 'Int',
+    default => 2000, # 2km
+);
+
 sub process {
     my ($self, $start_response, $env) = @_;
 
+    my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
+    my $lat   = $query{ $self->lat_query_key }; 
+    my $lng   = $query{ $self->lng_query_key };
+    my $range = $self->_calc_range($lat, $lng, $self->range);
+
     $self->dbh->exec(
-        qq{SELECT id,title,content WHERE lyra_ads_by_area status = 1 AND 
+        qq{SELECT id,title,content WHERE lyra_ads_by_area status = 1 AND
             MBRContains(GeomFromText('LineString(? ?,? ?'),location)},
+        ( @{$range->{end}}, @{$range->{start}} ),
         sub {
             # ここで処理
-
+ 
             # ログ取りのためのディスパッチ
         }
     );
@@ -41,12 +65,12 @@ sub _calc_range {
 
     return +{
         start => [
+            $lng - $range{lng},
             $lat - $range{lat},
-            $lng - $range{lng}
         ],
         end   => [
+            $lng + $range{lng},
             $lat + $range{lat},
-            $lng + $range{lng}
         ],
     };
 }
