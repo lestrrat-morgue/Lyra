@@ -49,7 +49,7 @@ sub process {
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
     my $lng   = $query{ $self->lng_query_key };
-    my @range = $self->_calc_range($lat, $lng, $self->range);
+    my @range = _calc_range($lat, $lng, $self->range);
 
     # XXX Should we just retrieve id, so that we can use a cached response?
     # what's the cache-hit ratio here? If most ads only appear once per
@@ -75,10 +75,8 @@ sub _respond_cb {
     $writer->close;
 }
 
-# XXX Can these be just functions instead of methods? do we really need to
-# go OO here? they seem to be simple utility functions
 sub _calc_range {
-    my ($self, $lat, $lng, $range) = @_;
+    my ($lat, $lng, $range) = @_;
 
     my @lat = split '\.', $lat;
     my %distance = (
