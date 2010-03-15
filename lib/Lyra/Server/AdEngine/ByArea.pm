@@ -49,7 +49,7 @@ sub process {
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
     my $lng   = $query{ $self->lng_query_key };
-    my $range = $self->_calc_range($lat, $lng, $self->range);
+    my @range = $self->_calc_range($lat, $lng, $self->range);
 
     # XXX Should we just retrieve id, so that we can use a cached response?
     # what's the cache-hit ratio here? If most ads only appear once per
@@ -57,8 +57,7 @@ sub process {
     $self->dbh->exec(
         q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
-        @{ $range->{end}   },
-        @{ $range->{start} },
+        @range,
         sub {
             use Data::Dumper;
             print Dumper @_;
@@ -94,18 +93,12 @@ sub _calc_range {
             sprintf('%.9f', (1/3600) * ($range/$distance{$key}));
     } 
 
-    # XXX Do we need a data structure this complex? can we just use
-    # ( $start_lng, $start_lat, $end_lng, $end_lat ) ?
-    return +{
-        start => [
-            $lng - $range{lng},
-            $lat - $range{lat},
-        ],
-        end   => [
-            $lng + $range{lng},
-            $lat + $range{lat},
-        ],
-    };
+    return (
+        $lng - $range{lng},
+        $lat - $range{lat},
+        $lng + $range{lng},
+        $lat + $range{lat},
+    );
 }
 
 sub _convert_to_msec {
