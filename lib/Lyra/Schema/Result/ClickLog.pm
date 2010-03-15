@@ -25,6 +25,6 @@ __PACKAGE__->add_columns(
         set_on_update => 1,
     }
 );
-__PACKAGE__->add_unique_constraint( 'unique_id' => [ 'id' ] );
+__PACKAGE__->set_primary_key('id');
 
 1;

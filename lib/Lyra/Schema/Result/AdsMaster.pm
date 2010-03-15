@@ -10,7 +10,7 @@ __PACKAGE__->table('lyra_ads_master');
 __PACKAGE__->add_columns(
     id => {
         data_type => 'CHAR',
-        size      => 10,
+        size      => 36,
         is_nullable => 0,
     },
     landing_uri => {
@@ -44,6 +44,6 @@ __PACKAGE__->add_columns(
         set_on_update => 1,
     }
 );
-__PACKAGE__->add_unique_constraint( 'unique_id' => [ 'id' ] );
+__PACKAGE__->set_primary_key('id');
 
 1;
