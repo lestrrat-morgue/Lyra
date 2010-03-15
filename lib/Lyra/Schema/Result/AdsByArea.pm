@@ -12,6 +12,10 @@ __PACKAGE__->add_columns(
         size      => 10,
         is_nullable => 0,
     },
+    uri => {
+        data_type => 'TEXT',
+        is_nullable => 0,
+    },
     title => {
         data_type => 'VARCHAR',
         size      => 64,
