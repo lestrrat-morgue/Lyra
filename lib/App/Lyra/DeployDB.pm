@@ -10,6 +10,7 @@ has password => (is => 'ro', isa => 'Str');
 has source => (is => 'ro', isa => 'ArrayRef', predicate => 'has_source');
 has drop_table => (is => 'ro', isa => 'Bool', default => 0);
 has schema_class => (is => 'ro', isa => 'Str', default => 'Lyra::Schema');
+has data_source => (is => 'ro', isa => 'Str');
 
 sub run {
     my $self = shift;
@@ -29,6 +30,12 @@ sub run {
 
     my $schema = $schema_class->connect( $self->dsn, $self->username, $self->password );
     $schema->deploy(\%deploy_args);
+
+    if (my $data_source = $self->data_source) {
+        Class::MOP::load_class( $data_source );
+        my $source = $data_source->new();
+        $source->deploy( $schema );
+    }
 }
 
 1;
