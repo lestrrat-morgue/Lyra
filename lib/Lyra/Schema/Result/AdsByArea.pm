@@ -12,7 +12,7 @@ __PACKAGE__->add_columns(
         size      => 10,
         is_nullable => 0,
     },
-    uri => {
+    landing_uri => {
         data_type => 'TEXT',
         is_nullable => 0,
     },
