@@ -47,7 +47,7 @@ if (-f 'Makefile') {
     my $makefile = do { local $/; <$fh> };
     close $fh or die $!;
 
-    $makefile =~ s/"-e" "(test_harness\(\$\(TEST_VERBOSE\), )/"-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" "-It\/lib" "-Mlocal::lib=extlib" "-MTest::mysqld" "-MTest::Memcached" "-e" "\\\$\$SIG{INT} = sub { CORE::exit }; my \\\$\$m = Test::mysqld->new(); \\\$\$ENV{TEST_DSN} = \\\$\$m->dsn(); my \\\$\$memd; if (! \\\$\$ENV{TEST_MEMCACHED_PORT} ) { \\\$\$memd = Test::Memcached->new(); \\\$\$memd->start(); \\\$\$ENV{TEST_MEMCACHED_PORT} = \\\$\$memd->option('tcp_port'); } $1't\/lib', 'base\/lib', /;
+    $makefile =~ s/"-e" "(test_harness\(\$\(TEST_VERBOSE\), )/"-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" "-It\/lib" "-Mlocal::lib=extlib" "-Mt::Lyra::Test::Fixture::Daemons" "-e" "my \\\$\$daemon = t::Lyra::Test::Fixture::Daemons->new(); \\\$\$daemon->start(); $1't\/lib', 'base\/lib', /;
 
     open (my $fh, '>', 'Makefile') or die "Could not open Makefile: $!";
     print $fh $makefile;
