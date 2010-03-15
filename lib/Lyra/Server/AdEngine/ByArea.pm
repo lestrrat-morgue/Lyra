@@ -51,6 +51,9 @@ sub process {
     my $lng   = $query{ $self->lng_query_key };
     my $range = $self->_calc_range($lat, $lng, $self->range);
 
+    # XXX Should we just retrieve id, so that we can use a cached response?
+    # what's the cache-hit ratio here? If most ads only appear once per
+    # cycle, then caching doesn't mean anything, so leave it as is
     $self->dbh->exec(
         q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
@@ -73,6 +76,8 @@ sub _respond_cb {
     $writer->close;
 }
 
+# XXX Can these be just functions instead of methods? do we really need to
+# go OO here? they seem to be simple utility functions
 sub _calc_range {
     my ($self, $lat, $lng, $range) = @_;
 
@@ -89,6 +94,8 @@ sub _calc_range {
             sprintf('%.9f', (1/3600) * ($range/$distance{$key}));
     } 
 
+    # XXX Do we need a data structure this complex? can we just use
+    # ( $start_lng, $start_lat, $end_lng, $end_lat ) ?
     return +{
         start => [
             $lng - $range{lng},
