@@ -8,7 +8,7 @@ __END__
 
 =head1 NAME
 
-Lyra - XXX
+Lyra - High Performance Web Advertisement Publishing Framework
 
 =head1 SETUP
 
@@ -50,5 +50,17 @@ Records a click.
               |         -------------------------
               --------> | Click log (file? DB?) |
                         -------------------------
+
+=head1 COPYRIGHT
+
+Copyright (c) Daisuke Maki 2010
+Copyright (c) Kazuhiro Nishikawa 2010
+
+=head1 LICENSE
+
+This program is free software; you can redistribut it and/or modify it
+under Artistic License 2.0
+
+http://www.perlfoundation.org/artistic_license_2_0
 
 =cut
