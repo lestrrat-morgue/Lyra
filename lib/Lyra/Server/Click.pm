@@ -66,7 +66,7 @@ sub _respond_cb {
     my ($start_response, $status, $headers, $content) = @_;
     # immediately return and close connection.
     my $writer = $start_response->( [ $status, $headers ] );
-    $writer->writer($content) if $content;
+    $writer->write($content) if $content;
     $writer->close;
 }
 

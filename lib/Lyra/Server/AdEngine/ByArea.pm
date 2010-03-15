@@ -46,32 +46,31 @@ sub process {
         undef $content;
     };
 
+    # check for some conditions
+    my ($status, @headers, $content);
+    if (! $env->{'psgi.streaming'}) {
+        $cv->send( 400 );
+        return;
+    }
+
+    if ($env->{REQUEST_METHOD} ne 'GET') {
+        $cv->send( 400 );
+        return;
+    }
+
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
     my $lng   = $query{ $self->lng_query_key };
     my @range = _calc_range($lat, $lng, $self->range);
 
-    # XXX Should we just retrieve id, so that we can use a cached response?
-    # what's the cache-hit ratio here? If most ads only appear once per
-    # cycle, then caching doesn't mean anything, so leave it as is
-    $self->dbh->exec(
-        q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
-            AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
-        @range,
-        sub {
-            use Data::Dumper;
-            print Dumper @_;
-            # ここで処理
-            # ログ取りのためのディスパッチ
-        }
-    );
+    $self->load_ad( $cv, \@range );
 }
 
 sub _respond_cb {
     my ($start_response, $status, $headers, $content) = @_;
     # immediately return and close connection.
     my $writer = $start_response->( [ $status, $headers ] );
-    $writer->writer($content) if $content;
+    $writer->write($content) if $content;
     $writer->close;
 }
 
@@ -99,17 +98,34 @@ sub _calc_range {
     );
 }
 
-sub _convert_to_msec {
-    my ($self, $coordinate) = @_;
-    my @coordinate = split '\.', $coordinate;
-    $coordinate[1] *= 10 if length($coordinate[1]) == 5;
-    return int($coordinate[0] * 3600000 + $coordinate[1] * 3.6);
+sub _load_ad_from_db_cb {
+    my ($self, $final_cv, $rows) = @_;
+
+    if (! defined $rows) {
+        confess "PANIC: loading from DB returned undef";
+    }
+
+    if (@$rows > 0) {
+        $final_cv->send( 200, ['content-type' => 'text/plain'], 'dummy' );
+    } else {
+        $final_cv->send( 200, ['content-type' => 'text/plain'], 'empty' );
+    }
 }
 
-sub _convert_to_degree {
-    my ($self, $coordinate) = @_;
-    my $degree = $coordinate / 3600000;
-    return nearest(0.000001, $degree);
+*load_ad = \&load_ad_from_db;
+
+sub load_ad_from_db {
+    my ($self, $final_cv, $range) = @_;
+
+    # XXX Should we just retrieve id, so that we can use a cached response?
+    # what's the cache-hit ratio here? If most ads only appear once per
+    # cycle, then caching doesn't mean anything, so leave it as is
+    $self->dbh->exec(
+        q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
+            AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
+        @$range,
+        sub { _load_ad_from_db_cb( $self, $final_cv, $_[1] ) }
+    );
 }
 
 __PACKAGE__->meta->make_immutable();
