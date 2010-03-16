@@ -7,7 +7,13 @@ use Math::Trig;
 use Moose;
 use namespace::autoclean;
 
-with qw(Lyra::Trait::AsyncPsgiApp Lyra::Trait::WithMemcached Lyra::Trait::WithDBI);
+extends 'Lyra::Server::AdEngine';
+with qw(
+    Lyra::Trait::AsyncPsgiApp
+    Lyra::Trait::WithMemcached
+    Lyra::Trait::WithDBI
+);
+
 # 1. 緯度経度から範囲をきめて矩形を作成(2点の緯度経度を作成）
 # 2. DBに登録してあるカラム（RTree-Index）に作成した条件（矩形）でSELECT
 # 3. SELECTした結果をXMLなりJSで返す

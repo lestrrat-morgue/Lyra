@@ -1,4 +1,4 @@
-package Lyra::Server::Click::Storage::File;
+package Lyra::Log::Storage::File;
 use Moose;
 use AnyEvent;
 use AnyEvent::AIO;
