@@ -92,11 +92,13 @@ sub build_app {
         RaiseError => 1,
         AutoCommit => 1,
     );
-    Lyra::Server::AdEngine::ByArea->new(
+    Lyra::Middleware::Render->new(
+Lyra::Server::AdEngine::ByArea->new(
         dbh => $dbh,
         request_log_storage => $request_log,
         impression_log_storage => $impression_log,
-    )->psgi_app;
+    )->psgi_app
+    );
 }
 
 __PACKAGE__->meta->make_immutable();

@@ -4,7 +4,6 @@ use Lyra::Extlib;
 use URI;
 use Math::Trig;
 use Moose;
-use Text::MicroTemplate::File;
 use namespace::autoclean;
 
 extends 'Lyra::Server::AdEngine';
