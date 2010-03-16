@@ -73,7 +73,7 @@ sub process {
         return;
     }
 
-    my @range = _calc_range($lat, $lng, $self->range);
+    my @range = _calc_range($self, $lat, $lng, $self->range);
 
     $self->load_ad( $cv, \@range );
 }
@@ -87,7 +87,7 @@ sub _respond_cb {
 }
 
 sub _calc_range {
-    my ($lat, $lng, $range) = @_;
+    my ($self, $lat, $lng, $range) = @_;
 
     my @lat = split '\.', $lat;
     my %distance = (
