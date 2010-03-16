@@ -44,10 +44,6 @@ sub process {
 
     # check for some conditions
     my ($status, @headers, $content);
-    if (! $env->{'psgi.streaming'}) {
-        $cv->send( 400 );
-        return;
-    }
 
     if ($env->{REQUEST_METHOD} ne 'GET') {
         $cv->send( 400 );
