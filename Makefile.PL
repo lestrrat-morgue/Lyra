@@ -8,14 +8,14 @@ requires 'MooseX::Getopt';
 requires 'AnyEvent';
 requires 'AnyEvent::DBI';
 requires 'Cache::Memcached::AnyEvent';
+requires 'Math::Trig';
+requires 'Math::Round';
 requires 'URI';
 requires 'namespace::autoclean';
 
 requires 'Plack';
 requires 'Twiggy';
 requires 'Server::Starter';
-requires 'Math::Trig';
-requires 'Math::Round';
 
 build_requires 'Module::Install::Bundle::LocalLib';
 
