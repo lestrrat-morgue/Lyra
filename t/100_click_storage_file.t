@@ -2,9 +2,9 @@ use strict;
 use Test::More;
 use AnyEvent;
 
-use_ok "Lyra::Server::Click::Storage::File";
+use_ok "Lyra::Log::Storage::File";
 
-my $store = Lyra::Server::Click::Storage::File->new(
+my $store = Lyra::Log::Storage::File->new(
     prefix => __FILE__,
 );
 

@@ -1,7 +1,7 @@
 package App::Lyra::Clickd;
 use Moose;
 use Lyra::Server::Click;
-use Lyra::Server::Click::Storage::File;
+use Lyra::Log::Storage::File;
 use File::Spec;
 use namespace::autoclean;
 
@@ -31,7 +31,7 @@ sub build_app {
     my $self = shift;
 
     # XXX Make this configurable
-    my $storage = Lyra::Server::Click::Storage::File->new(
+    my $storage = Lyra::Log::Storage::File->new(
         prefix => File::Spec->catfile(File::Spec->tmpdir, 'clickd.CHANGEME')
     );
 
