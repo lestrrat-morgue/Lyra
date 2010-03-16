@@ -4,7 +4,7 @@ use Lyra::Server::AdEngine::ByArea;
 use Lyra::Log::Storage::File;
 use namespace::autoclean;
 
-with 'Lyra::Trait::PsgiAppCmd'; # StandaloneServer';
+with 'Lyra::Trait::StandaloneServer';
 
 has '+psgi_server' => (
     default => 'Twiggy'

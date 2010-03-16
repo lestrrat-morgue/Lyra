@@ -5,7 +5,7 @@ use Lyra::Server::Click::Storage::File;
 use File::Spec;
 use namespace::autoclean;
 
-with 'Lyra::Trait::PsgiAppCmd';
+with 'Lyra::Trait::StandaloneServer';
 
 has '+psgi_server' => (
     default => 'Twiggy'
