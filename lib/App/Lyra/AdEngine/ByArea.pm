@@ -35,3 +35,21 @@ sub build_app {
 __PACKAGE__->meta->make_immutable();
 
 1;
+
+__END__
+
+=head1 NAME
+
+App::Lyra::AdEngine::ByArea - Area-based AdEngine
+
+=head1 SYNOPSIS
+
+    lyra_adengine_byarea --dsn=dbi:mysql:dbname=lyra 
+
+    # if you need to pass PSGI parameters, do so after --
+    lyra_adengine_byarea \
+        --dsn=dbi:mysql:dbname=lyra  \
+        -- \
+        --port=9999
+
+=cut
