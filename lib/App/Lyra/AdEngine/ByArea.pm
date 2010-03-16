@@ -29,7 +29,7 @@ has password => (
 sub build_log {
     my ($self, $prefix) = @_;
 
-    my $class = "Lyra::Log::Storage::File";
+    my $class = "File";
     local @ARGV = @{ $self->extra_argv };
     Getopt::Long::GetOptions( "$prefix-log-class=s" => \$class );
 
