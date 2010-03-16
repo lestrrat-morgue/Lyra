@@ -9,7 +9,7 @@ requires 'AnyEvent';
 requires 'AnyEvent::DBI';
 requires 'Cache::Memcached::AnyEvent';
 requires 'Math::Trig';
-requires 'Math::Round';
+requires 'Text::MicroTemplate::File';
 requires 'URI';
 requires 'namespace::autoclean';
 

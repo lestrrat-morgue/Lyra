@@ -2,9 +2,9 @@ package Lyra::Server::AdEngine::ByArea;
 use AnyEvent;
 use Lyra::Extlib;
 use URI;
-use Math::Round;
 use Math::Trig;
 use Moose;
+use Text::MicroTemplate::File;
 use namespace::autoclean;
 
 extends 'Lyra::Server::AdEngine';
@@ -34,6 +34,17 @@ has range => => (
     is => 'ro',
     isa => 'Int',
     default => 2000, # 2km
+);
+
+has templates_dir => (
+    is => 'ro',
+    isa => 'Str',
+);
+
+has template_file => (
+    is => 'rw',
+    isa => 'Str',
+    default => 'default.js',
 );
 
 sub process {
@@ -96,6 +107,20 @@ sub _calc_range {
         $lng + $range{lng},
         $lat + $range{lat},
     );
+}
+
+our $TEMPLATE;
+sub _rendar_ads {
+    my( $self, $ads) = @_;
+
+    $ads = [] unless defined $ads;
+
+    $TEMPLATE ||= Text::MicroTemplate::File->new(
+        include_path => [$self->templates_dir],
+        use_cache    => 1,
+    );
+   
+    return $TEMPLATE->render_file($self->template_file, @$ads);
 }
 
 sub _load_ad_from_db_cb {
