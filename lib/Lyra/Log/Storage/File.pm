@@ -7,6 +7,8 @@ use Fcntl;
 use POSIX ();
 use namespace::autoclean;
 
+extends 'Lyra::Log::Storage';
+
 has prefix => (
     is => 'ro',
     isa => 'Str',
