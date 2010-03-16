@@ -2,6 +2,7 @@ package App::Lyra::AdEngine::ByArea;
 use Moose;
 use Lyra::Server::AdEngine::ByArea;
 use Lyra::Log::Storage::File;
+use Lyra::Middleware::Render;
 use namespace::autoclean;
 
 with 'Lyra::Trait::StandaloneServer';
@@ -92,12 +93,12 @@ sub build_app {
         RaiseError => 1,
         AutoCommit => 1,
     );
-    Lyra::Middleware::Render->new(
-Lyra::Server::AdEngine::ByArea->new(
-        dbh => $dbh,
-        request_log_storage => $request_log,
-        impression_log_storage => $impression_log,
-    )->psgi_app
+    Lyra::Middleware::Render->wrap(
+        Lyra::Server::AdEngine::ByArea->new(
+            dbh => $dbh,
+            request_log_storage => $request_log,
+            impression_log_storage => $impression_log,
+        )->psgi_app
     );
 }
 

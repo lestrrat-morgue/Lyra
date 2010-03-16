@@ -35,17 +35,6 @@ has range => => (
     default => 2000, # 2km
 );
 
-has templates_dir => (
-    is => 'ro',
-    isa => 'Str',
-);
-
-has template_file => (
-    is => 'rw',
-    isa => 'Str',
-    default => 'default.js',
-);
-
 sub process {
     my ($self, $start_response, $env) = @_;
 
@@ -108,20 +97,6 @@ sub _calc_range {
     );
 }
 
-our $TEMPLATE;
-sub _rendar_ads {
-    my( $self, $ads) = @_;
-
-    $ads = [] unless defined $ads;
-
-    $TEMPLATE ||= Text::MicroTemplate::File->new(
-        include_path => [$self->templates_dir],
-        use_cache    => 1,
-    );
-   
-    return $TEMPLATE->render_file($self->template_file, @$ads);
-}
-
 sub _load_ad_from_db_cb {
     my ($self, $final_cv, $rows) = @_;
 
@@ -132,7 +107,12 @@ sub _load_ad_from_db_cb {
     if (@$rows > 0) {
         $final_cv->send( 200, ['content-type' => 'text/plain'], 'dummy' );
     } else {
-        $final_cv->send( 200, ['content-type' => 'text/plain'], 'empty' );
+        $final_cv->send( 200,
+            [
+                'content-type' => 'text/plain',
+                'x-lyra-render' => 1,
+            ], 
+        );
     }
 }
 
