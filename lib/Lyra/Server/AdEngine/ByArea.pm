@@ -67,6 +67,12 @@ sub process {
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
     my $lng   = $query{ $self->lng_query_key };
+
+    if (! defined $lat || ! defined $lng ) {
+        $cv->send( 400 );
+        return;
+    }
+
     my @range = _calc_range($lat, $lng, $self->range);
 
     $self->load_ad( $cv, \@range );
@@ -130,7 +136,13 @@ sub load_ad_from_db {
         q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
         @$range,
-        sub { _load_ad_from_db_cb( $self, $final_cv, $_[1] ) }
+        sub { 
+            if (!$_[1]) {
+                warn "Database error: $@";
+                return;
+            }
+            $self->_load_ad_from_db_cb( $final_cv, $_[1] )
+        }
     );
 }
 
