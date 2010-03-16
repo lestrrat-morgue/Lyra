@@ -1,6 +1,6 @@
 package App::Lyra::DeployDB;
 use Moose;
-use namespace::clean;
+use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
