@@ -16,6 +16,12 @@ has dsn => (
     required => 1,
 );
 
+has user => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
 sub build_app {
     my $self = shift;
 
@@ -27,6 +33,7 @@ sub build_app {
 
     Lyra::Server::AdEngine::ByArea->new(
         dbh_dsn => $self->dsn,
+        dbh_user => $self->user,
         request_log_storage => $request_log,
         impression_log_storage => $impression_log,
     )->psgi_app;
