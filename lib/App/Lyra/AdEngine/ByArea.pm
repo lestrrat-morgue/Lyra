@@ -4,13 +4,13 @@ use Lyra::Server::AdEngine::ByArea;
 use Lyra::Log::Storage::File;
 use namespace::autoclean;
 
-with 'Lyra::Trait::PsgiAppCmd';
+with 'Lyra::Trait::PsgiAppCmd'; # StandaloneServer';
 
 has '+psgi_server' => (
     default => 'Twiggy'
 );
 
-has dbh_dsn => (
+has dsn => (
     is => 'ro',
     isa => 'Str',
     required => 1,
@@ -26,7 +26,7 @@ sub build_app {
 
 
     Lyra::Server::AdEngine::ByArea->new(
-        dbh_dsn => $self->dbh_dsn,
+        dbh_dsn => $self->dsn,
         request_log_storage => $request_log,
         impression_log_storage => $impression_log,
     )->psgi_app;
