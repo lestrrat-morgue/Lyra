@@ -32,7 +32,7 @@ sub process {
     # This is the CV that gets called at the end
     my $cv = AE::cv {
         my ($status, $header, $content) = $_[0]->recv;
-        _respond_cb($start_response, $status, $header, $content);
+        respond_cb($start_response, $status, $header, $content);
         if ($status eq 302) { # which is success for us
             $self->log_click( \%log_info );
         }
@@ -56,14 +56,6 @@ sub process {
     my $ad_id = $query{ $self->ad_id_query_key };
 
     $self->load_ad( $ad_id, $cv );
-}
-
-sub _respond_cb {
-    my ($start_response, $status, $headers, $content) = @_;
-    # immediately return and close connection.
-    my $writer = $start_response->( [ $status, $headers ] );
-    $writer->write($content) if $content;
-    $writer->close;
 }
 
 sub _load_ad_from_memd_cb {

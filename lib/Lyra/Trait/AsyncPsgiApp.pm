@@ -20,4 +20,12 @@ sub psgi_app {
     }
 }
 
+sub respond_cb {
+    my ($start_response, $status, $headers, $content) = @_;
+    # immediately return and close connection.
+    my $writer = $start_response->( [ $status, $headers ] );
+    $writer->write($content) if $content;
+    $writer->close;
+}
+
 1;
