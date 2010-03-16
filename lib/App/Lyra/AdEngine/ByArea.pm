@@ -19,7 +19,11 @@ has dsn => (
 has user => (
     is => 'ro',
     isa => 'Str',
-    required => 1,
+);
+
+has password => (
+    is => 'ro',
+    isa => 'Str',
 );
 
 sub build_app {
@@ -30,11 +34,16 @@ sub build_app {
     my $request_log = Lyra::Log::Storage::File->new();
     my $impression_log = Lyra::Log::Storage::File->new();
 
-
+    my $dbh = AnyEvent::DBI->new(
+        $self->dsn,
+        $self->user,
+        $self->password,
+        exec_server => 1,
+        RaiseError => 1,
+        AutoCommit => 1,
+    );
     Lyra::Server::AdEngine::ByArea->new(
-        dbh_dsn => $self->dsn,
-        dbh_user => $self->user,
-        request_log_storage => $request_log,
+        dbh => $dbh,
         impression_log_storage => $impression_log,
     )->psgi_app;
 }

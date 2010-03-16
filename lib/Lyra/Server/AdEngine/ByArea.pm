@@ -120,7 +120,7 @@ sub load_ad_from_db {
     # XXX Should we just retrieve id, so that we can use a cached response?
     # what's the cache-hit ratio here? If most ads only appear once per
     # cycle, then caching doesn't mean anything, so leave it as is
-    $self->dbh->exec(
+    $self->execsql(
         q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(LineString(? ?,? ?)),location)},
         @$range,

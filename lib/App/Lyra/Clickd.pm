@@ -11,10 +11,20 @@ has '+psgi_server' => (
     default => 'Twiggy'
 );
 
-has dbh_dsn => (
+has dsn => (
     is => 'ro',
     isa => 'Str',
     required => 1,
+);
+
+has user => (
+    is => 'ro',
+    isa => 'Str',
+);
+
+has password => (
+    is => 'ro',
+    isa => 'Str',
 );
 
 sub build_app {
@@ -25,8 +35,16 @@ sub build_app {
         prefix => File::Spec->catfile(File::Spec->tmpdir, 'clickd.CHANGEME')
     );
 
+    my $dbh = AnyEvent::DBI->new(
+        $self->dsn,
+        $self->user,
+        $self->password,
+        exec_server => 1,
+        RaiseError => 1,
+        AutoCommit => 1,
+    );
     Lyra::Server::Click->new(
-        dbh_dsn => $self->dbh_dsn,
+        dbh => $dbh,
         log_storage => $storage,
     )->psgi_app;
 }

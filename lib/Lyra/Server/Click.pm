@@ -5,7 +5,11 @@ use Lyra::Extlib;
 use URI;
 use namespace::autoclean;
 
-with qw(Lyra::Trait::WithMemcached Lyra::Trait::WithDBI Lyra::Trait::AsyncPsgiApp);
+with qw(
+    Lyra::Trait::WithMemcached
+    Lyra::Trait::WithDBI
+    Lyra::Trait::AsyncPsgiApp
+);
 
 has ad_id_query_key => (
     is => 'ro',
@@ -93,7 +97,7 @@ sub load_ad_from_memd {
 sub load_ad_from_db {
     my ($self, $final_cv, $ad_id) = @_;
 
-    $self->dbh->exec(
+    $self->execsql(
         "SELECT landing_uri FROM click WHERE id = ?",
         $ad_id,
         sub { _load_ad_from_db_cb( $self, $final_cv, $ad_id, $_[1] ) }

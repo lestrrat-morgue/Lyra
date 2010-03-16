@@ -9,32 +9,9 @@ has dbh => (
     lazy_build => 1,
 );
 
-has dbh_dsn => (
-    is => 'ro',
-    isa => 'Str',
-    required => 1,
-);
-
-has dbh_user => (
-    is => 'ro',
-    isa => 'Str',
-);
-
-has dbh_password => (
-    is => 'ro',
-    isa => 'Str',
-);
-
-sub _build_dbh {
+sub execsql {
     my $self = shift;
-    return AnyEvent::DBI->new(
-        $self->dbh_dsn,
-        $self->dbh_user,
-        $self->dbh_password,
-        exec_server => 1,
-        RaiseError => 1,
-        AutoCommit => 1,
-    );
+    $self->dbh->exec(@_);
 }
 
 1;

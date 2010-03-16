@@ -33,7 +33,7 @@ Lyra - High Performance Web Advertisement Publishing Framework
 
 =head2 RUN!
 
-    ./bin/lyra_clickd --dbh_dsn=dbi:mysql:....
+    ./bin/lyra_clickd --dsn=dbi:mysql:....
 
 =head1 lyra_clickd
 
