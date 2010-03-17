@@ -114,7 +114,7 @@ sub _calc_range {
     );
 }
 
-sub _rendar_ads {
+sub _render_ads {
     my( $self, $ads) = @_;
 
     $ads = [] unless defined $ads;
@@ -138,9 +138,9 @@ sub _load_ad_from_db_cb {
     }
 
     if (@$rows > 0) {
-        $final_cv->send( 200, ['content-type' => 'text/plain'], 'dummy' );
+        $final_cv->send( 200, ['content-type' => 'text/javascript'], 'dummy' );
     } else {
-        $final_cv->send( 200, ['content-type' => 'text/plain'], 'empty' );
+        $final_cv->send( 200, ['content-type' => 'text/javascript'], '' );
     }
 }
 

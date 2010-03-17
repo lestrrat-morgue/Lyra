@@ -19,7 +19,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     is( 135.554261389, $range[2], 'lat(start)');
     is( 34.634212144, $range[3], 'lat(end)');
 
-    my $js = $engine->_rendar_ads([
+    my $js = $engine->_render_ads([
         ['foo','hogehoge'],
         ['bar','barbar']
     ]);    
