@@ -36,6 +36,11 @@ has range => => (
     default => 2000, # 2km
 );
 
+has template => (
+    is => 'rw',
+    default => sub {},
+);
+
 has templates_dir => (
     is => 'ro',
     isa => 'Str',
@@ -109,18 +114,20 @@ sub _calc_range {
     );
 }
 
-our $TEMPLATE;
 sub _rendar_ads {
     my( $self, $ads) = @_;
 
     $ads = [] unless defined $ads;
 
-    $TEMPLATE ||= Text::MicroTemplate::File->new(
-        include_path => [$self->templates_dir],
-        use_cache    => 1,
-    );
-   
-    return $TEMPLATE->render_file($self->template_file, @$ads);
+    unless( $self->template ) {
+        my $template = Text::MicroTemplate::File->new(
+            include_path => [$self->templates_dir],
+            use_cache    => 1,
+        );
+        $self->template($template);
+    }
+
+    return $self->template->render_file($self->template_file, @$ads);
 }
 
 sub _load_ad_from_db_cb {
