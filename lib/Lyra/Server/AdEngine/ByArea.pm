@@ -37,8 +37,9 @@ has range => => (
 );
 
 has template => (
-    is => 'rw',
-    default => sub {},
+    is => 'ro',
+    isa => 'Text::MicroTemplate::File',
+    lazy_build => 1,
 );
 
 has templates_dir => (
@@ -51,6 +52,14 @@ has template_file => (
     isa => 'Str',
     default => 'default.js',
 );
+
+sub _build_template {
+    my $self = shift;
+    return Text::MicroTemplate::File->new(
+        include_path => [$self->templates_dir],
+        use_cache    => 1,
+    );
+}
 
 sub process {
     my ($self, $start_response, $env) = @_;
@@ -118,14 +127,6 @@ sub _render_ads {
     my( $self, $ads) = @_;
 
     $ads = [] unless defined $ads;
-
-    unless( $self->template ) {
-        my $template = Text::MicroTemplate::File->new(
-            include_path => [$self->templates_dir],
-            use_cache    => 1,
-        );
-        $self->template($template);
-    }
 
     return $self->template->render_file($self->template_file, @$ads);
 }
