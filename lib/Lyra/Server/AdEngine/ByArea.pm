@@ -118,14 +118,9 @@ sub _render_ads {
         @$ads);
 }
 
-*load_ad = \&load_ad_from_db;
-
-sub load_ad_from_db {
+sub load_ad {
     my ($self, $final_cv, $range) = @_;
 
-    # XXX Should we just retrieve id, so that we can use a cached response?
-    # what's the cache-hit ratio here? If most ads only appear once per
-    # cycle, then caching doesn't mean anything, so leave it as is
     $self->execsql(
         q{SELECT id,title,content,uuid() FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(?),location)},
