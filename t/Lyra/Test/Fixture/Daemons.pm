@@ -19,6 +19,9 @@ sub start {
 
     if ( ! $ENV{ TEST_MEMCACHED_PORT } ) {
         my $memd = Test::Memcached->new();
+        if (! $memd) {
+            confess "failed to find memcached";
+        }
         $memd->start();
         $ENV{ TEST_MEMCACHED_PORT } = $memd->option('tcp_port' );
 
