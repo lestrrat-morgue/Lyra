@@ -12,7 +12,11 @@ sub start {
     $SIG{INT} = sub { CORE::exit };
 
     if (! $ENV{ TEST_DSN }) {
-        my $mysql = Test::mysqld->new();
+        my $mysql = Test::mysqld->new(
+            my_cnf => {
+                'skip-networking' => '',
+            }
+        );
         $ENV{TEST_DSN} = $mysql->dsn();
         $self->{_mysql} = $mysql;
     }
