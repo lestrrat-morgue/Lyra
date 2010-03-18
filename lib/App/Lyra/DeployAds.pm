@@ -6,14 +6,19 @@ use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
-has dsn => (is => 'ro', isa => 'Str', required => 1);
+has dsn => (is => 'ro', isa => 'Str', required => 1, default => $ENV{TEST_DSN});
 has username => (is => 'ro', isa => 'Str');
 has password => (is => 'ro', isa => 'Str');
 
 sub run {
     my $self = shift;
 
-    my $schema = Lyra::Schema->connect($self->dsn, $self->username, $self->password, { RaiseError => 1, AutoCommit => 1 });
+    my $schema = Lyra::Schema->connect(
+        $self->dsn,
+        $self->username || $ENV{TEST_USERNAME},
+        $self->password || $ENV{TEST_PASSWORD},
+        { RaiseError => 1, AutoCommit => 1 }
+    );
 
     # Deploy a Dummy Table. This is a bit tricky
     my $source = $schema->source('AdsByArea');

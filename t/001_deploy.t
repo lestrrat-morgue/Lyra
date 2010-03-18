@@ -7,14 +7,11 @@ use_ok "App::Lyra::DeployDB";
 eval {
     # Deploy to master DB
     App::Lyra::DeployDB->new(
-        dsn => $ENV{TEST_DSN},
         data_source => 't::Lyra::Test::Fixture::TestDB',
     )->run();
 
     # Deploy from mater to ads by area
-    App::Lyra::DeployAds->new(
-        dsn => $ENV{TEST_DSN}
-    )->run();
+    App::Lyra::DeployAds->new()->run();
 
 };
 ok(! $@, "Done deploy") or diag($@);

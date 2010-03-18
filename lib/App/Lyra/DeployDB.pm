@@ -4,7 +4,7 @@ use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
-has dsn => (is => 'ro', isa => 'Str', required => 1);
+has dsn => (is => 'ro', isa => 'Str', required => 1, default => $ENV{TEST_DSN});
 has username => (is => 'ro', isa => 'Str');
 has password => (is => 'ro', isa => 'Str');
 has source => (is => 'ro', isa => 'ArrayRef', predicate => 'has_source');
@@ -28,7 +28,12 @@ sub run {
         $deploy_args{ sources } = $self->source;
     }
 
-    my $schema = $schema_class->connect( $self->dsn, $self->username, $self->password );
+    my $schema = $schema_class->connect(
+        $self->dsn,
+        $self->username || $ENV{TEST_USERNAME},
+        $self->password || $ENV{TEST_PASSWORD},
+        { RaiseError => 1, AutoCommit => 1 }
+    );
     $schema->deploy(\%deploy_args);
 
     if (my $data_source = $self->data_source) {
