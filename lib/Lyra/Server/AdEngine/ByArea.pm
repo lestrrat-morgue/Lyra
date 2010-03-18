@@ -121,7 +121,7 @@ sub load_ad_from_db {
     # what's the cache-hit ratio here? If most ads only appear once per
     # cycle, then caching doesn't mean anything, so leave it as is
     $self->execsql(
-        q{SELECT id,title,content FROM lyra_ads_by_area WHERE status = 1 
+        q{SELECT id,title,content,uuid() FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(?),location)},
         sprintf( 'LineString(%f %f,%f %f)', @$range ),
         sub { 

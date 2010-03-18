@@ -94,6 +94,7 @@ sub build_app {
     );
     Lyra::Server::AdEngine::ByArea->new(
         dbh => $dbh,
+        templates_dir => './templates',
         request_log_storage => $request_log,
         impression_log_storage => $impression_log,
     )->psgi_app;
