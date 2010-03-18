@@ -77,21 +77,26 @@ sub _build_template {
 sub process {
     my ($self, $start_response, $env) = @_;
 
-    # This is the CV that gets called at the end
-    my $cv = AE::cv {
-        my ($ads) = $_[0]->recv;
-
-        respond_cb($start_response,
-            200,
-            [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
-            $self->_render_ads($ads)
-        )
-    };
-
     if ($env->{REQUEST_METHOD} ne 'GET') {
         respond_cb( $start_response, 400 );
         return;
     }
+
+    # This is the CV that gets called at the end
+    my $cv = AE::cv {
+        my ($ads) = $_[0]->recv;
+
+        my $output = $self->template->render_file(
+            $self->template_file, 
+            $self->click_uri,
+            @$ads
+        );
+        respond_cb($start_response,
+            200,
+            [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
+            $output,
+        )
+    };
 
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
     my $lat   = $query{ $self->lat_query_key }; 
@@ -104,34 +109,17 @@ sub process {
 
     my @range = Lyra::Util::calc_range( $lat, $lng, $self->range );
 
-    $self->load_ad( $cv, \@range );
-}
-
-sub _render_ads {
-    my( $self, $ads) = @_;
-
-    $ads = [] unless defined $ads;
-
-    return $self->template->render_file(
-        $self->template_file, 
-        $self->click_uri,
-        @$ads);
-}
-
-sub load_ad {
-    my ($self, $final_cv, $range) = @_;
-
     $self->execsql(
         q{SELECT id,title,content,uuid() FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(?),location)},
-        sprintf( 'LineString(%f %f,%f %f)', @$range ),
+        sprintf( 'LineString(%f %f,%f %f)', @range ),
         sub { 
             if (!$_[1]) {
                 warn "Database error: $@";
                 return;
             }
 
-            $final_cv->send( $_[1] );
+            $cv->send( $_[1] );
         }
     );
 }
