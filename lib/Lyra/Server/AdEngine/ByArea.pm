@@ -83,7 +83,7 @@ sub process {
 
         respond_cb($start_response,
             200,
-            [ 'Content-Type' => 'text/javascript' ],
+            [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
             $self->_render_ads($ads)
         )
     };
