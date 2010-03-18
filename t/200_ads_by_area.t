@@ -12,6 +12,7 @@ sub test_ad_loading (@) {
 
     my $engine = Lyra::Server::AdEngine::ByArea->new(
         dbh => async_dbh(),
+        click_uri => "http://127.0.0.1:9999",
         template_dir => $FindBin::Bin . '/../templates',
     );
     my $cv = AE::cv {
@@ -26,6 +27,7 @@ sub test_ad_loading (@) {
 {
     my $engine = Lyra::Server::AdEngine::ByArea->new(
         dbh_dsn => $ENV{TEST_DSN},
+        click_uri => "http://127.0.0.1:9999",
         templates_dir => $FindBin::Bin . '/../templates',
     );
 
@@ -38,12 +40,14 @@ sub test_ad_loading (@) {
     ok( abs(135.554261389 - $range[2]) < 0.0005, 'lat(start)');
     ok( abs(34.634212144 - $range[3]) < 0.0005, 'lat(end)');
 
-    my $js = $engine->_render_ads([
-        ['foo','hogehoge'],
-        ['bar','barbar']
-    ]);    
+    my $js = $engine->_render_ads(
+        [
+            ['test_id001', 'title001', 'content001', 'uuid001'],
+            ['test_id002', 'title002', 'content002', 'uuid002']
+        ]
+    );
 
-    like($js, qr{target="_blank">bar</a> barbar</li>}, 'template 1');
+    like($js, qr{target="_blank">title001</a> content001</li>}, 'template 1');
     like($js, qr{document\.writeln\('</ul>'\);}, 'template 2');
 }
 
