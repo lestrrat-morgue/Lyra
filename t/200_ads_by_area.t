@@ -31,7 +31,6 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     like($js, qr{document\.writeln\('</ul>'\);}, 'template 2');
 }
 
-
 {
     my $dbh = async_dbh();
 
@@ -46,6 +45,16 @@ use_ok "Lyra::Server::AdEngine::ByArea";
         dbh => $dbh,
         templates_dir => $FindBin::Bin . '/../templates',
     );
+
+    {
+        my $lat    = 35.689265;
+        my $lng    = 139.678481;
+        my $range  = 2000;
+        my @box_xs = Lyra::Util::calc_range( $lat, $lng, $range );
+        my @box_pp = $engine->_calc_range( $lat, $lng, $range );
+        is_deeply( \@box_xs, \@box_pp ) or
+            diag( "box_xs = \n", explain(\@box_xs), "\n", "box_pp = \n", explain(\@box_pp), "\n" );
+    }
 
     {
         my $lat   = 35.689265;

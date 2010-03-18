@@ -1,6 +1,6 @@
 package Lyra::Server::AdEngine::ByArea;
 use AnyEvent;
-use Lyra::Extlib;
+use Lyra;
 use URI;
 use Math::Trig;
 use Moose;
@@ -89,33 +89,9 @@ sub process {
         return;
     }
 
-    my @range = _calc_range($self, $lat, $lng, $self->range);
+    my @range = Lyra::Util::calc_range( $lat, $lng, $self->range );
 
     $self->load_ad( $cv, \@range );
-}
-
-sub _calc_range {
-    my ($self, $lat, $lng, $range) = @_;
-
-    my @lat = split '\.', $lat;
-    my %distance = (
-        lat => sprintf('%.1f', 40054782 / (360*60*60)),
-        lng => sprintf('%.1f', 6378150 * 
-            cos($lat[0]/180*pi) * 2 * pi / (360*60*60)),
-    ); 
-
-    my %range;
-    for my $key qw(lat lng) {
-        $range{$key} = 
-            sprintf('%.9f', (1/3600) * ($range/$distance{$key}));
-    } 
-
-    return (
-        $lng - $range{lng},
-        $lat - $range{lat},
-        $lng + $range{lng},
-        $lat + $range{lat},
-    );
 }
 
 sub _render_ads {
