@@ -39,16 +39,6 @@ sub test_ad_loading (@) {
     ok( abs(34.598253856 - $range[1]) < 0.0005, 'lng(end)');
     ok( abs(135.554261389 - $range[2]) < 0.0005, 'lat(start)');
     ok( abs(34.634212144 - $range[3]) < 0.0005, 'lat(end)');
-
-    my $js = $engine->_render_ads(
-        [
-            ['test_id001', 'title001', 'content001', 'uuid001'],
-            ['test_id002', 'title002', 'content002', 'uuid002']
-        ]
-    );
-
-    like($js, qr{target="_blank">title001</a> content001</li>}, 'template 1');
-    like($js, qr{document\.writeln\('</ul>'\);}, 'template 2');
 }
 
 {

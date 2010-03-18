@@ -14,7 +14,7 @@ my $filename;
 my $cv = AE::cv { unlink $filename };
 foreach my $i (1..100) {
     $cv->begin();
-    $store->store(undef, sub {
+    $store->store("message_$i", sub {
         $filename ||= shift;
         $cv->end;
     });
