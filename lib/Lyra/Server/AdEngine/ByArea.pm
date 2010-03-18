@@ -66,22 +66,17 @@ sub process {
 
     # This is the CV that gets called at the end
     my $cv = AE::cv {
-        my ($status, $header, $content) = $_[0]->recv;
-        respond_cb($start_response, $status, $header, $content);
-        #if ($status eq 302) { # which is success for us
-        #    $self->log_click( \%log_info );
-        #}
-        #undef %log_info;
-        undef $status;
-        undef $header;
-        undef $content;
+        my ($ads) = $_[0]->recv;
+
+        respond_cb($start_response,
+            200,
+            [ 'Content-Type' => 'text/javascript' ],
+            $self->_render_ads($ads)
+        )
     };
 
-    # check for some conditions
-    my ($status, @headers, $content);
-
     if ($env->{REQUEST_METHOD} ne 'GET') {
-        $cv->send( 400 );
+        respond_cb( $start_response, 400 );
         return;
     }
 
@@ -90,7 +85,7 @@ sub process {
     my $lng   = $query{ $self->lng_query_key };
 
     if (! defined $lat || ! defined $lng ) {
-        $cv->send( 400 );
+        respond_cb( $start_response, 400 );
         return;
     }
 
@@ -138,11 +133,7 @@ sub _load_ad_from_db_cb {
         confess "PANIC: loading from DB returned undef";
     }
 
-    if (@$rows > 0) {
-        $final_cv->send( 200, ['content-type' => 'text/javascript'], 'dummy' );
-    } else {
-        $final_cv->send( 200, ['content-type' => 'text/javascript'], '' );
-    }
+    $final_cv->send( $rows );
 }
 
 *load_ad = \&load_ad_from_db;
