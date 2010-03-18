@@ -7,6 +7,22 @@ use t::Lyra::Test qw(async_dbh);
 
 use_ok "Lyra::Server::AdEngine::ByArea";
 
+sub test_ad_loading (@) {
+    my ($lat, $lng, $range, $cb) = @_;
+
+    my $engine = Lyra::Server::AdEngine::ByArea->new(
+        dbh => async_dbh(),
+        template_dir => $FindBin::Bin . '/../templates',
+    );
+    my $cv = AE::cv {
+        $cb->( shift->recv );
+    };
+    my @range = Lyra::Util::calc_range( $lat, $lng, $range );
+    $engine->load_ad( $cv, \@range );
+    $cv->recv;
+}
+
+
 {
     my $engine = Lyra::Server::AdEngine::ByArea->new(
         dbh_dsn => $ENV{TEST_DSN},
@@ -32,56 +48,20 @@ use_ok "Lyra::Server::AdEngine::ByArea";
 }
 
 {
-    my $dbh = async_dbh();
-
-    my $cv  = AE::cv {
-        my $cv = shift;
-        my $rows = $cv->recv;
+    test_ad_loading 35.689265, 139.678481, 2000, sub {
+        my $rows = shift;
         if (! is(scalar(@$rows), 3, "Expected number of ads 1") ) {
             diag( "Got these ads:\n", explain( $rows ) );
         }
     };
-    my $engine = Lyra::Server::AdEngine::ByArea->new(
-        dbh => $dbh,
-        templates_dir => $FindBin::Bin . '/../templates',
-    );
-
-    {
-        my $lat   = 35.689265;
-        my $lng   = 139.678481;
-        my $range = 2000;
-        my @range = Lyra::Util::calc_range( $lat, $lng, $range);
-
-        $engine->load_ad( $cv, \@range );
-    }
-
-    $cv->recv;
 }
 
-{
-    my $dbh = async_dbh();
-
-    my $cv  = AE::cv {
-        my $cv = shift;
-        my $rows = $cv->recv;
+{ # 幡ヶ谷中心
+    test_ad_loading 35.678603, 139.67450, 2500, sub {
+        my $rows = shift;
         if (! is(scalar(@$rows), 4, "Expected number of ads 2") ) {
             diag( "Got these ads:\n", explain( $rows ) );
         }
     };
-    my $engine = Lyra::Server::AdEngine::ByArea->new(
-        dbh => $dbh,
-        templates_dir => $FindBin::Bin . '/../templates',
-    );
-
-    {
-        my $lat   = 35.678603;
-        my $lng   = 139.67450;
-        my $range = 2500;
-        my @range = Lyra::Util::calc_range( $lat, $lng, $range);
-
-        $engine->load_ad( $cv, \@range );
-    }
-
-    $cv->recv;
 }
 
