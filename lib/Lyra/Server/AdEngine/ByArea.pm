@@ -118,16 +118,6 @@ sub _render_ads {
         @$ads);
 }
 
-sub _load_ad_from_db_cb {
-    my ($self, $final_cv, $rows) = @_;
-
-    if (! defined $rows) {
-        confess "PANIC: loading from DB returned undef";
-    }
-
-    $final_cv->send( $rows );
-}
-
 *load_ad = \&load_ad_from_db;
 
 sub load_ad_from_db {
@@ -145,7 +135,8 @@ sub load_ad_from_db {
                 warn "Database error: $@";
                 return;
             }
-            $self->_load_ad_from_db_cb( $final_cv, $_[1] )
+
+            $final_cv->send( $_[1] );
         }
     );
 }
