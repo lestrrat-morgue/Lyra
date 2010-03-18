@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 7;
+use Test::More tests => 8;
 use AnyEvent;
 use AnyEvent::DBI;
 use FindBin;
@@ -17,10 +17,10 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     my $lng = 135.532560;
 
     my @range = Lyra::Util::calc_range( $lat, $lng, 2000 );
-    is( 135.510858611, $range[0], 'lat(start)');
-    is( 34.598253856, $range[1], 'lng(end)');
-    is( 135.554261389, $range[2], 'lat(start)');
-    is( 34.634212144, $range[3], 'lat(end)');
+    ok( abs(135.510858611 - $range[0]) < 0.0005, 'lat(start)');
+    ok( abs(34.598253856 - $range[1]) < 0.0005, 'lng(end)');
+    ok( abs(135.554261389 - $range[2]) < 0.0005, 'lat(start)');
+    ok( abs(34.634212144 - $range[3]) < 0.0005, 'lat(end)');
 
     my $js = $engine->_render_ads([
         ['foo','hogehoge'],
