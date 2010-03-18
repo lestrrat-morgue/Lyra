@@ -82,6 +82,15 @@ sub process {
         return;
     }
 
+    my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
+    my $lat   = $query{ $self->lat_query_key }; 
+    my $lng   = $query{ $self->lng_query_key };
+
+    if (! defined $lat || ! defined $lng ) {
+        respond_cb( $start_response, 400 );
+        return;
+    }
+
     # This is the CV that gets called at the end
     my $cv = AE::cv {
         my ($ads) = $_[0]->recv;
@@ -97,22 +106,17 @@ sub process {
             $output,
         );
 
-            my $store = $self->impression_log_storage;
-            foreach my $ad (@$ads) {
-                $store->store( 
-                    join("\t", @$ad) . "\n"
-                );
-            }
+        my $store;
+        $store = $self->request_log_storage;
+        $store->store(join("\t", $lat, $lng) . "\n");
+
+        $store = $self->impression_log_storage;
+        foreach my $ad (@$ads) {
+            $store->store( 
+                join("\t", @$ad) . "\n"
+            );
+        }
     };
-
-    my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;
-    my $lat   = $query{ $self->lat_query_key }; 
-    my $lng   = $query{ $self->lng_query_key };
-
-    if (! defined $lat || ! defined $lng ) {
-        respond_cb( $start_response, 400 );
-        return;
-    }
 
     my @range = Lyra::Util::calc_range( $lat, $lng, $self->range );
 
