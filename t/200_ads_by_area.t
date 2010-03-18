@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 8;
+use Test::More tests => 9;
 use AnyEvent;
 use AnyEvent::DBI;
 use FindBin;
@@ -37,7 +37,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     my $cv  = AE::cv {
         my $cv = shift;
         my $rows = $cv->recv;
-        if (! is(scalar(@$rows), 3, "Expected number of ads") ) {
+        if (! is(scalar(@$rows), 3, "Expected number of ads 1") ) {
             diag( "Got these ads:\n", explain( $rows ) );
         }
     };
@@ -52,11 +52,36 @@ use_ok "Lyra::Server::AdEngine::ByArea";
         my $range = 2000;
         my @range = Lyra::Util::calc_range( $lat, $lng, $range);
 
-        # XXX Test   httpクライアントからテストした方がいいかな・・・
         $engine->load_ad( $cv, \@range );
     }
 
     $cv->recv;
 }
 
+{
+    my $dbh = async_dbh();
+
+    my $cv  = AE::cv {
+        my $cv = shift;
+        my $rows = $cv->recv;
+        if (! is(scalar(@$rows), 4, "Expected number of ads 2") ) {
+            diag( "Got these ads:\n", explain( $rows ) );
+        }
+    };
+    my $engine = Lyra::Server::AdEngine::ByArea->new(
+        dbh => $dbh,
+        templates_dir => $FindBin::Bin . '/../templates',
+    );
+
+    {
+        my $lat   = 35.678603;
+        my $lng   = 139.67450;
+        my $range = 2500;
+        my @range = Lyra::Util::calc_range( $lat, $lng, $range);
+
+        $engine->load_ad( $cv, \@range );
+    }
+
+    $cv->recv;
+}
 
