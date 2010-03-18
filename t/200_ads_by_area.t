@@ -16,7 +16,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     my $lat = 34.616233;
     my $lng = 135.532560;
 
-    my @range = $engine->_calc_range( $lat, $lng, 2000 );
+    my @range = Lyra::Util::calc_range( $lat, $lng, 2000 );
     is( 135.510858611, $range[0], 'lat(start)');
     is( 34.598253856, $range[1], 'lng(end)');
     is( 135.554261389, $range[2], 'lat(start)');
@@ -50,7 +50,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
         my $lat   = 35.689265;
         my $lng   = 139.678481;
         my $range = 2000;
-        my @range = $engine->_calc_range( $lat, $lng, $range);
+        my @range = Lyra::Util::calc_range( $lat, $lng, $range);
 
         # XXX Test   httpクライアントからテストした方がいいかな・・・
         $engine->load_ad( $cv, \@range );
