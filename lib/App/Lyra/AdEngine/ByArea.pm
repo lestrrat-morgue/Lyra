@@ -49,7 +49,7 @@ sub build_log {
 
     my $object;
     if ( $class->isa('Lyra::Log::Storage::File') ) {
-        my $file_prefix = "adengine_byarea";
+        my $file_prefix = "adengine_byarea_$prefix";
         Getopt::Long::GetOptions( "$prefix-log-prefix=s" => \$file_prefix );
         $object = $class->new(prefix => $file_prefix);
     } elsif ( $class->isa('Lyra::Log::Storage::Q4M') ) {
