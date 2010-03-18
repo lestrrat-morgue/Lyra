@@ -4,6 +4,7 @@ use Lyra;
 use URI;
 use Math::Trig;
 use Moose;
+use Moose::Util::TypeConstraints;
 use Text::MicroTemplate::File;
 use namespace::autoclean;
 
@@ -18,10 +19,16 @@ with qw(
 # 2. DBに登録してあるカラム（RTree-Index）に作成した条件（矩形）でSELECT
 # 3. SELECTした結果をXMLなりJSで返す
 
+class_type 'URI';
+coerce 'URI'
+    => from 'Str'
+    => via { URI->new($_) }
+;
 has click_uri => (
     is => 'ro',
-    isa => 'Str',
+    isa => 'URI',
     required => 1,
+    coerce => 1,
 );
 
 has lat_query_key => (
