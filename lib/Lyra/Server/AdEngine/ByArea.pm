@@ -18,6 +18,12 @@ with qw(
 # 2. DBに登録してあるカラム（RTree-Index）に作成した条件（矩形）でSELECT
 # 3. SELECTした結果をXMLなりJSで返す
 
+has click_uri => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
 has lat_query_key => (
     is => 'ro',
     isa => 'Str',
@@ -99,7 +105,10 @@ sub _render_ads {
 
     $ads = [] unless defined $ads;
 
-    return $self->template->render_file($self->template_file, @$ads);
+    return $self->template->render_file(
+        $self->template_file, 
+        $self->click_uri,
+        @$ads);
 }
 
 sub _load_ad_from_db_cb {

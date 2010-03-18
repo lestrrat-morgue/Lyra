@@ -10,6 +10,12 @@ has '+psgi_server' => (
     default => 'Twiggy'
 );
 
+has click_uri => (
+    is => 'ro',
+    isa => 'Str',
+    required => 1,
+);
+
 has dsn => (
     is => 'ro',
     isa => 'Str',
@@ -94,6 +100,7 @@ sub build_app {
     );
     Lyra::Server::AdEngine::ByArea->new(
         dbh => $dbh,
+        click_uri => $self->click_uri,
         templates_dir => './templates',
         request_log_storage => $request_log,
         impression_log_storage => $impression_log,
