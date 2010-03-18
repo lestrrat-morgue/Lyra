@@ -8,6 +8,8 @@ BEGIN
     XSLoader::load __PACKAGE__, $VERSION;
 }
 
+sub _NOOP {}
+
 1;
 
 __END__

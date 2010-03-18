@@ -4,6 +4,7 @@ use AnyEvent;
 use AnyEvent::AIO;
 use IO::AIO;
 use Fcntl;
+use Lyra;
 use POSIX ();
 use namespace::autoclean;
 
@@ -21,8 +22,6 @@ has groups => (
     default => sub { +{} }
 );
 
-sub _noop {};
-
 # filename is <prefix>.<timestamp>.<pid>
 # where timestamp is YYYYMMDDhhXX, and it's recycled every 15 minutes.
 # so on a given hour, you get YYYYMMDDhh01, 02, 03, 04
@@ -38,7 +37,7 @@ sub store {
     );
 
     # このCB、本当はいらないんだけど、これがないとテストがうまく書けない・・・
-    $cb ||= \&_noop;
+    $cb ||= \&Lyra::_NOOP;
     my $buffer = "DUMMY\n";
     my $length = length $buffer;
 
