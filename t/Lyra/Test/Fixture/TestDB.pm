@@ -18,32 +18,39 @@ sub deploy {
     my @ads = map {
         $_->{id} ||= sprintf('test_ads_by_area%03d', $count++);
         $_->{landing_uri} ||= "http://127.0.0.1/$_->{id}";
+        $_->{status} = 1 unless exists $_->{status};
         $_;
     } (
         {
             title => 'オペラシティ',
             content => '最寄り駅は初台です',
-            status => 1,
             location => \q|GeomFromText('POINT(139.685945 35.683616)')|,
         },
         {
             title => 'NTT東日本',
             content => '最寄り駅は初台です',
-            status  => 1,
             location => \q|GeomFromText('POINT(139.678481 35.689265)')|,
         },
         {
             title => '幡ヶ谷駅',
             content => '初台のとなりです',
-            status => 1,
             location => \q|GeomFromText('POINT(139.674506 35.678603)')|,
         },
         {
             title => '明治大学',
             content => '最寄り駅は明大前です',
-            status => 1,
             location => \q|GeomFromText('POINT(139.641874 35.675566)')|,
-        }
+        },
+        {
+            title => '渋谷駅',
+            content => '南口の使いにくさは異常です',
+            location => \q|GeomFromText('POINT(139.703946 35.657775)')|,
+        },
+        {
+            title => '三軒茶屋駅',
+            content => 'こちらのハナマサの魚は結構質がいいですね',
+            location => \q|GeomFromText('POINT(139.700174 35.656826)')|,
+        },
     );
 
     foreach my $ad (@ads) {
