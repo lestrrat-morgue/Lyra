@@ -35,11 +35,17 @@ has password => (
 sub build_log {
     my ($self, $prefix) = @_;
 
+    my $disable = 0;
     my $class = "File";
     local @ARGV = @{ $self->extra_argv };
-    Getopt::Long::GetOptions( "$prefix-log-class=s" => \$class );
+    Getopt::Long::GetOptions(
+        "$prefix-log-class=s" => \$class,
+        "$prefix-log-disable!" => \$disable
+    );
 
-    if ($class !~ s/^\+//) {
+    if ($disable) {
+        $class = "Lyra::Log::Storage::Null";
+    } elsif ($class !~ s/^\+//) {
         $class = "Lyra::Log::Storage::$class";
     }
 
@@ -76,6 +82,8 @@ sub build_log {
         $args{table} = $table if defined $table;
         $args{sql} = $table if defined $table;
         $object = $class->new(%args);
+    } else {
+        $object = $class->new();
     }
 
     return $object;
