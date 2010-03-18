@@ -95,7 +95,14 @@ sub process {
             200,
             [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
             $output,
-        )
+        );
+
+            my $store = $self->impression_log_storage;
+            foreach my $ad (@$ads) {
+                $store->store( 
+                    join("\t", @$ad) . "\n"
+                );
+            }
     };
 
     my %query = URI->new('http://dummy/?' . ($env->{QUERY_STRING} || ''))->query_form;

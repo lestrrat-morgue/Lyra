@@ -26,7 +26,7 @@ has groups => (
 # where timestamp is YYYYMMDDhhXX, and it's recycled every 15 minutes.
 # so on a given hour, you get YYYYMMDDhh01, 02, 03, 04
 sub store {
-    my ($self, $args, $cb) = @_;
+    my ($self, $message, $cb) = @_;
 
     my @localtime = localtime();
     my $filename = join('.', 
@@ -38,12 +38,11 @@ sub store {
 
     # このCB、本当はいらないんだけど、これがないとテストがうまく書けない・・・
     $cb ||= \&Lyra::_NOOP;
-    my $buffer = "DUMMY\n";
-    my $length = length $buffer;
+    my $length = length $message;
 
     aio_open $filename, O_WRONLY|O_CREAT|O_APPEND, 0644, sub {
         my $fh = shift or die "Failed to  open $filename for writing: $!";
-        aio_write $fh, -1, $length, $buffer, 0, sub { $cb->($filename) };
+        aio_write $fh, -1, $length, $message, 0, sub { $cb->($filename) };
     };
 }
 
