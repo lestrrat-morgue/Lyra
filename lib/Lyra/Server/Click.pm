@@ -67,7 +67,7 @@ sub _load_ad_from_memd_cb {
     my ($self, $final_cv, $ad_id, $ad) = @_;
 
     if ($ad) {
-        $final_cv->send( 302, [ Location => $ad->landing_uri ] );
+        $final_cv->send( 302, [ Location => $ad->[0] ] );
     } else {
         $self->load_ad_from_db( $final_cv, $ad_id );
     }
@@ -80,7 +80,8 @@ sub _load_ad_from_db_cb {
     }
 
     if (@$rows > 0) {
-        # We don't do the caching. let some other guy take care of it
+        $self->cache->set( $ad_id, $rows->[0], \&Lyra::_NOOP );
+
         $final_cv->send( 302, [ Location => $rows->[0]->[0] ] );
     } else {
         $final_cv->send( 404 );
