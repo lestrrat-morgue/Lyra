@@ -31,7 +31,7 @@ __PACKAGE__->add_columns(
         is_nullable => 0,
     },
     location => {
-        data_type => 'geometry',
+        data_type => 'POINT',
         is_nullable => 0,
     },
     created_on => {

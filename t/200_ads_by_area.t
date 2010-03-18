@@ -37,7 +37,7 @@ use_ok "Lyra::Server::AdEngine::ByArea";
     my $cv  = AE::cv {
         my $cv = shift;
         my $rows = $cv->recv;
-        if (! is(scalar(@$rows), 4, "Expected number of ads") ) {
+        if (! is(scalar(@$rows), 3, "Expected number of ads") ) {
             diag( "Got these ads:\n", explain( $rows ) );
         }
     };
