@@ -118,8 +118,11 @@ sub process {
         }
     };
 
-    my @range = Lyra::Util::calc_range( $lat, $lng, $self->range );
+    $self->load_ad( $cv, Lyra::Util::calc_range( $lat, $lng, $self->range ) );
+}
 
+sub load_ad {
+    my ($self, $cv, @range) = @_;
     $self->execsql(
         q{SELECT id,title,content,uuid() FROM lyra_ads_by_area WHERE status = 1 
             AND MBRContains(GeomFromText(?),location)},

@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 9;
+use Test::More tests => 7;
 use AnyEvent;
 use AnyEvent::DBI;
 use FindBin;
@@ -19,7 +19,7 @@ sub test_ad_loading (@) {
         $cb->( shift->recv );
     };
     my @range = Lyra::Util::calc_range( $lat, $lng, $range );
-    $engine->load_ad( $cv, \@range );
+    $engine->load_ad( $cv, @range );
     $cv->recv;
 }
 
