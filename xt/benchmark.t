@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 1;
+use Test::More tests => 2;
 use URI;
 use t::Lyra::Test qw(start_daemons click_server adengine_byarea find_program);
 
