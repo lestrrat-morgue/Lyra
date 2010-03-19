@@ -1,7 +1,6 @@
 use strict;
 use Test::More tests => 7;
 use AnyEvent;
-use AnyEvent::DBI;
 use FindBin;
 use t::Lyra::Test qw(async_dbh);
 
