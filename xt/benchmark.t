@@ -1,5 +1,5 @@
 use strict;
-use Test::More tests => 2;
+use Test::More;
 use URI;
 use t::Lyra::Test qw(start_daemons click_server adengine_byarea find_program);
 
@@ -9,10 +9,13 @@ my $ab_params = $ENV{TEST_AB_PARAMS} || '-n 1000 -c 100';
 
 my $guard;
 if (! $ENV{TEST_DSN} || ! $ENV{TEST_MEMCACHED_PORT}) {
+    plan tests => 2;
     $guard = start_daemons();
     subtest 'deploy' => sub {
         require 't/001_deploy.t';
     };
+} else {
+    plan tests => 1;
 }
 
 my $click_server = click_server
