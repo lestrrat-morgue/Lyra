@@ -4,8 +4,15 @@ use base qw(Exporter);
 use AnyEvent::DBI;
 use Cache::Memcached::AnyEvent;
 use t::Lyra::Test::Plackup;
+use t::Lyra::Test::Fixture::Daemons;
 
-our @EXPORT_OK = qw(async_dbh click_server adengine_byarea);
+our @EXPORT_OK = qw(start_daemons async_dbh click_server adengine_byarea find_program);
+
+sub start_daemons(@) {
+    my $guard = t::Lyra::Test::Fixture::Daemons->new();
+    $guard->start();
+    return $guard;
+}
 
 sub async_dbh(@) {
     return AnyEvent::DBI->new(
@@ -53,6 +60,7 @@ sub adengine_byarea(@) {
     my %args = @_;
     my $click_uri = delete $args{click_server}
         or die "You need to specify a click server URL";
+    my $templates_dir = delete $args{templates_dir} || 'templates';
     return plackup(
         base_dir => 't/',
         server => 'Twiggy',
@@ -66,10 +74,30 @@ sub adengine_byarea(@) {
                 click_uri => $click_uri,
                 request_log_storage => Lyra::Log::Storage::Null->new(),
                 impression_log_storage => Lyra::Log::Storage::Null->new(),
+                templates_dir => $templates_dir,
             )->psgi_app
         },
         %args,
     );
 }
+
+sub find_program($) {
+    my $prog = shift;
+    my $path = _get_path_of($prog);
+    return $path
+        if $path;
+    die "could not find $prog, please set appropriate PATH";
+}
+
+sub _get_path_of {
+    my $prog = shift;
+    my $path = `which $prog 2> /dev/null`;
+    chomp $path
+        if $path;
+    $path = ''
+        unless -x $path;
+    $path;
+}
+
 
 1;

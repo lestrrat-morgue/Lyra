@@ -40,6 +40,8 @@ auto_install;
 auto_set_repository;
 bundle_local_lib;
 
+author_tests 'xt';
+
 WriteAll;
 
 if (-f 'Makefile') {
@@ -47,7 +49,7 @@ if (-f 'Makefile') {
     my $makefile = do { local $/; <$fh> };
     close $fh or die $!;
 
-    $makefile =~ s/"-e" "(test_harness\(\$\(TEST_VERBOSE\), )/"-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" "-It\/lib" "-Mlocal::lib=extlib" "-Mt::Lyra::Test::Fixture::Daemons" "-e" "my \\\$\$daemon = t::Lyra::Test::Fixture::Daemons->new(); \\\$\$daemon->start(); $1't\/lib', 'base\/lib', /;
+    $makefile =~ s/"-e" "(test_harness\(\$\(TEST_VERBOSE\), )/"-I\$(INST_LIB)" "-I\$(INST_ARCHLIB)" "-Mlocal::lib=extlib" "-Mt::Lyra::Test=start_daemons" "-e" "my \\\$\$guard = start_daemons; $1't\/lib', 'base\/lib', /;
 
     open (my $fh, '>', 'Makefile') or die "Could not open Makefile: $!";
     print $fh $makefile;
