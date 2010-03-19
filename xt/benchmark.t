@@ -38,6 +38,6 @@ diag( "Running benchmarks....");
 my $output = qx($ab $ab_params '$ad_engine_url');
 ok($? == 0);
 diag( "Benchmark done, waiting for cleanup" );
-$guard->stop;
+$guard->stop if $guard;
 
 diag( $output );
