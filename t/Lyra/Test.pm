@@ -8,6 +8,11 @@ use t::Lyra::Test::Fixture::Daemons;
 
 our @EXPORT_OK = qw(start_daemons async_dbh click_server adengine_byarea find_program);
 
+sub null_log {
+    require Lyra::Log::Storage::Null;
+    Lyra::Log::Storage::Null->new();
+}
+
 sub start_daemons(@) {
     my $guard = t::Lyra::Test::Fixture::Daemons->new();
     $guard->start();
@@ -44,12 +49,11 @@ sub click_server(@) {
         base_dir => 't/',
         server => 'Twiggy',
         app => sub {
-            require Lyra::Log::Storage::Null;
             require Lyra::Server::Click;
 
             Lyra::Server::Click->new(
                 dbh => async_dbh(),
-                log_storage => Lyra::Log::Storage::Null->new(),
+                log_storage => null_log(),
             )->psgi_app
         },
         @_,
@@ -61,19 +65,20 @@ sub adengine_byarea(@) {
     my $click_uri = delete $args{click_server}
         or die "You need to specify a click server URL";
     my $templates_dir = delete $args{templates_dir} || 'templates';
+    my $request_log = delete $args{request_log};
+    my $impression_log = delete $args{impression_log};
     return plackup(
         base_dir => 't/',
         server => 'Twiggy',
         app => sub {
-            require Lyra::Log::Storage::Null;
             require Lyra::Server::AdEngine::ByArea;
 
             Lyra::Server::AdEngine::ByArea->new(
                 dbh => async_dbh(),
                 cache => async_memcached(),
                 click_uri => $click_uri,
-                request_log_storage => Lyra::Log::Storage::Null->new(),
-                impression_log_storage => Lyra::Log::Storage::Null->new(),
+                request_log_storage => $request_log || null_log(),
+                impression_log_storage => $impression_log || null_log(),
                 templates_dir => $templates_dir,
             )->psgi_app
         },
