@@ -1,11 +1,13 @@
 package Lyra::Server::AdEngine::ByArea;
 use AnyEvent;
+use AnyEvent::HTTP qw(http_post);
+use JSON::XS qw(encode_json);
 use Lyra;
-use URI;
 use Math::Trig;
 use Moose;
 use Moose::Util::TypeConstraints;
 use Text::MicroTemplate::File;
+use URI;
 use namespace::autoclean;
 
 extends 'Lyra::Server::AdEngine';
@@ -29,6 +31,12 @@ has click_uri => (
     isa => 'URI',
     required => 1,
     coerce => 1,
+);
+
+has worker_uri => (
+    is => 'ro',
+    isa => 'Str',
+    default => 'http://127.0.0.1:9999',
 );
 
 has lat_query_key => (
@@ -95,27 +103,29 @@ sub process {
     my $cv = AE::cv {
         my ($ads) = $_[0]->recv;
 
-        my $output = $self->template->render_file(
-            $self->template_file, 
-            $self->click_uri,
-            @$ads
-        );
-        respond_cb($start_response,
-            200,
-            [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
-            $output,
-        );
+        my $render_guard;
+        $render_guard = http_post $self->worker_uri . "/render",
+            encode_json { click_uri => $self->click_uri . "", ads => $ads },
+            sub {
+                my $data = shift;
 
-        my $store;
-        $store = $self->request_log_storage;
-        $store->store(join("\t", $lat, $lng) . "\n");
+                undef $render_guard;
+                respond_cb($start_response,
+                    200,
+                    [ 'Content-Type' => 'text/javascript; charset=UTF-8' ],
+                    $data,
+                );
+            }
+        ;
 
-        $store = $self->impression_log_storage;
-        foreach my $ad (@$ads) {
-            $store->store( 
-                join("\t", @$ad) . "\n"
-            );
-        }
+        my $log_guard; 
+        $log_guard = http_post $self->worker_uri . "/log/adengine",
+            encode_json { lat => $lat, lng => $lng, ads => $ads },
+            on_header => sub { 
+                undef $log_guard;
+                return ()
+            }
+        ;
     };
 
     $self->load_ad( $cv, Lyra::Util::calc_range( $lat, $lng, $self->range ) );

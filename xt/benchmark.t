@@ -1,5 +1,6 @@
 use strict;
 use Test::More;
+use Lyra::Log::Storage::File;
 use URI;
 use t::Lyra::Test qw(start_daemons click_server adengine_byarea find_program);
 
@@ -27,6 +28,12 @@ my $adengine = adengine_byarea
     base_dir => 'xt',
     click_server => "http://127.0.0.1:" . $click_server->port,
     name => 'benchmark_adengine',
+    request_log => Lyra::Log::Storage::File->new(
+        prefix => "xt/benchmark_request",
+    ),
+    impression_log => Lyra::Log::Storage::File->new(
+        prefix => "xt/benchmark_impression",
+    ),
 ;
 
 my $ad_engine_url = URI->new("http://127.0.0.1");
