@@ -12,6 +12,7 @@ requires 'Math::Trig';
 requires 'Text::MicroTemplate::File';
 requires 'URI';
 requires 'namespace::autoclean';
+requires 'Router::Simple';
 
 requires 'Plack';
 requires 'Twiggy';
