@@ -84,7 +84,7 @@ sub _load_ad_from_db_cb {
 
         $final_cv->send( 302, [ Location => $rows->[0]->[0] ] );
     } else {
-        $final_cv->send( 404 );
+        $final_cv->send( 404, [] );
     }
 }
 
