@@ -59,6 +59,10 @@ Records a click.
               --------> | Click log (file? DB?) |
                         -------------------------
 
+=head1 TODO
+
+Look into MongoDB or CouchDB as the default backend
+
 =head1 COPYRIGHT
 
 Copyright (c) Daisuke Maki 2010
