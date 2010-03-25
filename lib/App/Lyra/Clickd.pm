@@ -35,6 +35,7 @@ sub build_app {
         prefix => File::Spec->catfile(File::Spec->tmpdir, 'clickd.CHANGEME')
     );
 
+    my $cv = AE::cv;
     my $dbh = AnyEvent::DBI->new(
         $self->dsn,
         $self->user,
@@ -42,11 +43,22 @@ sub build_app {
         exec_server => 1,
         RaiseError => 1,
         AutoCommit => 1,
+        on_connect => sub {
+            if ($_[1]) {
+                $cv->send(
+                Lyra::Server::Click->new(
+                    dbh => $_[0],
+                    log_storage => $storage,
+                )->psgi_app );
+            }
+            else {
+                warn $@;
+                exit;
+            }
+        }
     );
-    Lyra::Server::Click->new(
-        dbh => $dbh,
-        log_storage => $storage,
-    )->psgi_app;
+
+    return $cv->recv;
 }
 
 __PACKAGE__->meta->make_immutable();
