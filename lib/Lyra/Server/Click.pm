@@ -6,9 +6,8 @@ use URI;
 use namespace::autoclean;
 
 with qw(
-    Lyra::Trait::WithMemcached
-    Lyra::Trait::WithDBI
     Lyra::Trait::AsyncPsgiApp
+    Lyra::Trait::WithMongoDB
 );
 
 has ad_id_query_key => (
@@ -38,7 +37,7 @@ sub process {
         my ($status, $header, $content) = $_[0]->recv;
         respond_cb($start_response, $status, $header, $content);
         if ($status eq 302) { # which is success for us
-            $self->log_click( \%log_info );
+#            $self->log_click( \%log_info );
         }
         undef %log_info;
         undef $status;
@@ -60,50 +59,21 @@ sub process {
 
     my $ad_id = $query{ $self->ad_id_query_key };
 
-    $self->load_ad( $ad_id, $cv );
+    $self->load_ad( $cv, $ad_id );
 }
 
-sub _load_ad_from_memd_cb {
-    my ($self, $final_cv, $ad_id, $ad) = @_;
-
-    if ($ad) {
-        $final_cv->send( 302, [ Location => $ad->[0] ] );
-    } else {
-        $self->load_ad_from_db( $final_cv, $ad_id );
-    }
-}
-
-sub _load_ad_from_db_cb {
-    my ($self, $final_cv, $ad_id, $rows) = @_;
-    if (! defined $rows) {
-        confess "PANIC: loading from DB returned undef";
-    }
-
-    if (@$rows > 0) {
-        $self->cache->set( $ad_id, $rows->[0], \&Lyra::_NOOP );
-
-        $final_cv->send( 302, [ Location => $rows->[0]->[0] ] );
-    } else {
-        $final_cv->send( 404, [] );
-    }
-}
-
-# Ad retrieval. Try memcached, if you failed, load from DB
-*load_ad = \&load_ad_from_memd;
-
-sub load_ad_from_memd {
-    my ($self, $ad_id, $final_cv) = @_;
-    $self->cache->get( $ad_id, sub { _load_ad_from_memd_cb( $self, $final_cv, $ad_id, @_ ) } );
-}
-
-sub load_ad_from_db {
+sub load_ad {
     my ($self, $final_cv, $ad_id) = @_;
 
-    $self->execsql(
-        "SELECT landing_uri FROM lyra_ads_master WHERE id = ?",
-        $ad_id,
-        sub { _load_ad_from_db_cb( $self, $final_cv, $ad_id, $_[1] ) }
-    );
+    my $cv = AE::cv {
+        if (my ($ad) = $_[0]->recv) {
+            $final_cv->send( 302, [ Location => $ad->{landing_uri} ] );
+        } else {
+            $final_cv->send( 404 );
+        }
+    };
+
+    $self->query_collection( 'ads_byarea', { id => $ad_id }, $cv );
 }
 
 1;

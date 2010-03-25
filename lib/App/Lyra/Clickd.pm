@@ -11,13 +11,25 @@ has '+psgi_server' => (
     default => 'Twiggy'
 );
 
-has dsn => (
+has hostname => (
+    is => 'ro',
+    isa => 'Str',
+    default => '127.0.0.1',
+);
+
+has port => (
+    is => 'ro',
+    isa => 'Int',
+    default => 27017
+);
+
+has dbname => (
     is => 'ro',
     isa => 'Str',
     required => 1,
 );
 
-has user => (
+has username => (
     is => 'ro',
     isa => 'Str',
 );
@@ -35,30 +47,21 @@ sub build_app {
         prefix => File::Spec->catfile(File::Spec->tmpdir, 'clickd.CHANGEME')
     );
 
-    my $cv = AE::cv;
-    my $dbh = AnyEvent::DBI->new(
-        $self->dsn,
-        $self->user,
-        $self->password,
-        exec_server => 1,
-        RaiseError => 1,
-        AutoCommit => 1,
-        on_connect => sub {
-            if ($_[1]) {
-                $cv->send(
-                Lyra::Server::Click->new(
-                    dbh => $_[0],
-                    log_storage => $storage,
-                )->psgi_app );
-            }
-            else {
-                warn $@;
-                exit;
-            }
-        }
+    my $conn = MongoDB::Connection->new(
+        host => $self->hostname,
+        port => $self->port
     );
+    if ( $self->username && $self->password ) {
+        $conn->authenticate( $self->dbname, $self->username, $self->password );
+    }
 
-    return $cv->recv;
+    my $db = $conn->get_database('lyra');
+
+    my $server = Lyra::Server::Click->new(
+        db => $db,
+        log_storage => $storage
+    );
+    return $server->psgi_app;
 }
 
 __PACKAGE__->meta->make_immutable();
