@@ -36,12 +36,6 @@ sub req_open {
    [1, 1]
 }
 
-sub get_collection {
-    my ($db, $coll) = @_;
-    return $COLLECTIONS{ $coll }
-        ||= ($DBS{$db} ||= $CONN->get_database($db))->get_collection($coll);
-}
-
 sub req_query {
    my (undef, $dbname, $coll, @args) = @{+shift};
    my $db = $DBS{$dbname} ||= $CONN->get_database($dbname);
@@ -70,13 +64,39 @@ sub req_find_one {
         return [ undef, "Could not get collection $coll" ]
    }
 
-   my $thing =  get_collection($db, $coll)->find_one(@args);
+   my $thing = $collection->find_one(@args);
    [1, $thing]
 }
 
 sub req_insert {
-   my (undef, $db, $coll, @args) = @{+shift};
-   my $thing = get_collection($db, $coll)->insert(@args);
+   my (undef, $dbname, $coll, @args) = @{+shift};
+   my $db = $DBS{$dbname} ||= $CONN->get_database($dbname);
+   if (! $db) {
+        return [ undef, "Could not get db $dbname" ];
+   }
+
+   my $collection =  $COLLECTIONS{ $coll } ||= $db->get_collection($coll);
+   if (! $collection) {
+        return [ undef, "Could not get collection $coll" ]
+   }
+
+   my $thing = $collection->insert(@args);
+   [1, $thing]
+}
+
+sub req_update {
+   my (undef, $dbname, $coll, @args) = @{+shift};
+   my $db = $DBS{$dbname} ||= $CONN->get_database($dbname);
+   if (! $db) {
+        return [ undef, "Could not get db $dbname" ];
+   }
+
+   my $collection =  $COLLECTIONS{ $coll } ||= $db->get_collection($coll);
+   if (! $collection) {
+        return [ undef, "Could not get collection $coll" ]
+   }
+
+   my $thing = $collection->update(@args);
    [1, $thing]
 }
 
