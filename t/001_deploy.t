@@ -9,9 +9,5 @@ eval {
     App::Lyra::DeployDB->new(
         data_source => 't::Lyra::Test::Fixture::TestDB',
     )->run();
-
-    # Deploy from mater to ads by area
-    App::Lyra::DeployAds->new()->run();
-
 };
 ok(! $@, "Done deploy") or diag($@);

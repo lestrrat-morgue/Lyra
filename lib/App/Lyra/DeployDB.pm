@@ -1,45 +1,28 @@
 package App::Lyra::DeployDB;
 use Moose;
+use MongoDB;
 use namespace::autoclean;
 
 with 'MooseX::Getopt';
 
-has dsn => (is => 'ro', isa => 'Str', required => 1, default => $ENV{TEST_DSN});
+has hostname => (is => 'ro', isa => 'Str', default => '127.0.0.1');
+has port     => (is => 'ro', isa => 'Int', default => 27017);
 has username => (is => 'ro', isa => 'Str');
 has password => (is => 'ro', isa => 'Str');
-has source => (is => 'ro', isa => 'ArrayRef', predicate => 'has_source');
-has drop_table => (is => 'ro', isa => 'Bool', default => 0);
-has schema_class => (is => 'ro', isa => 'Str', default => 'Lyra::Schema');
 has data_source => (is => 'ro', isa => 'Str');
 
 sub run {
     my $self = shift;
 
-    my $schema_class = $self->schema_class;
-    if (! Class::MOP::is_class_loaded( $schema_class ) ) {
-        Class::MOP::load_class( $schema_class );
-    }
-
-    my %deploy_args = (
-        add_drop_table => $self->drop_table,
-        quote_field_names => 0,
+    my $mongodb = MongoDB::Connection->new(
+        host => $self->hostname,
+        port => $self->port
     );
-    if ( $self->has_source ) {
-        $deploy_args{ sources } = $self->source;
-    }
-
-    my $schema = $schema_class->connect(
-        $self->dsn,
-        $self->username || $ENV{TEST_USERNAME},
-        $self->password || $ENV{TEST_PASSWORD},
-        { RaiseError => 1, AutoCommit => 1 }
-    );
-    $schema->deploy(\%deploy_args);
 
     if (my $data_source = $self->data_source) {
         Class::MOP::load_class( $data_source );
         my $source = $data_source->new();
-        $source->deploy( $schema );
+        $source->deploy( $mongodb );
     }
 }
 

@@ -9,9 +9,7 @@ has adserver_uri => (
 );
 
 sub deploy {
-    my ($self, $schema) = @_;
-
-    my $master_rs = $schema->resultset('AdsMaster');
+    my ($self, $mongodb) = @_;
 
     # XXX use some other method if you want to bulk insert 
     my $count = 1;
@@ -53,9 +51,8 @@ sub deploy {
         },
     );
 
-    foreach my $ad (@ads) {
-        $master_rs->create( $ad );
-    }
+    my $collection = $mongodb->get_database('lyra')->get_collection('ads_byarea');
+    $collection->batch_insert( \@ads );
 }
 
 __PACKAGE__->meta->make_immutable();
