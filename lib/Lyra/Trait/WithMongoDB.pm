@@ -1,13 +1,11 @@
 package Lyra::Trait::WithMongoDB;
 use Moose::Role;
-use Coro;
-use Coro::AnyEvent;
-use MongoDB;
+use AnyEvent::MongoDB;
 use namespace::autoclean;
 
 has db => (
     is => 'ro',
-    isa => 'MongoDB::Database',
+    isa => 'AnyEvent::MongoDB',
     required => 1,
 );
 
@@ -31,10 +29,10 @@ sub get_collection {
 
 sub query_collection {
     my ($self, $collection, $query, $cv) = @_;
-    async_pool {
-        my $cursor = $_[1]->query( $_[2] );
-        $_[0]->send( $cursor->all );
-    } $cv, $self->get_collection($collection), $query;
+
+    $self->db->query('lyra', $collection, $query, sub {
+        $cv->send(@{$_[1]});
+    });
 }
 
 1;

@@ -47,21 +47,22 @@ sub build_app {
         prefix => File::Spec->catfile(File::Spec->tmpdir, 'clickd.CHANGEME')
     );
 
-    my $conn = MongoDB::Connection->new(
+    my $cv = AE::cv;
+    my $conn = AnyEvent::MongoDB->new(
         host => $self->hostname,
-        port => $self->port
-    );
-    if ( $self->username && $self->password ) {
-        $conn->authenticate( $self->dbname, $self->username, $self->password );
-    }
-
-    my $db = $conn->get_database('lyra');
-
+        port => $self->port,
+        exec_server => 1,
+        on_connect => sub {
+            my $db = shift;
     my $server = Lyra::Server::Click->new(
         db => $db,
         log_storage => $storage
     );
-    return $server->psgi_app;
+            $cv->send($server->psgi_app);
+        }
+    );
+
+    return $cv->recv;
 }
 
 __PACKAGE__->meta->make_immutable();
