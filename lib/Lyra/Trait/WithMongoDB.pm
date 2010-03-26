@@ -28,9 +28,9 @@ sub get_collection {
 }
 
 sub query_collection {
-    my ($self, $collection, $query, $cv) = @_;
-
-    $self->db->query('lyra', $collection, $query, sub {
+    my $self = shift;
+    my $cv = pop @_;
+    $self->db->query('lyra', @_, sub {
         $cv->send(@{$_[1]});
     });
 }

@@ -1,5 +1,6 @@
 package Lyra::Server::AdEngine::ByArea;
 use AnyEvent;
+use Encode ();
 use Lyra;
 use URI;
 use Math::Trig;
@@ -11,8 +12,7 @@ use namespace::autoclean;
 extends 'Lyra::Server::AdEngine';
 with qw(
     Lyra::Trait::AsyncPsgiApp
-    Lyra::Trait::WithMemcached
-    Lyra::Trait::WithDBI
+    Lyra::Trait::WithMongoDB
 );
 
 # 1. 緯度経度から範囲をきめて矩形を作成(2点の緯度経度を作成）
@@ -113,7 +113,7 @@ sub process {
         $store = $self->impression_log_storage;
         foreach my $ad (@$ads) {
             $store->store( 
-                join("\t", @$ad) . "\n"
+                join("\t", $ad->{id}) . "\n"
             );
         }
     };
@@ -121,19 +121,25 @@ sub process {
     $self->load_ad( $cv, Lyra::Util::calc_range( $lat, $lng, $self->range ) );
 }
 
+my @box = ();
+my %q = (
+    location => {
+        '$within' => { '$box' => \@box }
+    }
+);
 sub load_ad {
     my ($self, $cv, @range) = @_;
-    $self->execsql(
-        q{SELECT id,title,content,uuid() FROM lyra_ads_by_area WHERE status = 1 
-            AND MBRContains(GeomFromText(?),location)},
-        sprintf( 'LineString(%f %f,%f %f)', @range ),
-        sub { 
-            if (!$_[1]) {
-                warn "Database error: $@";
-                return;
-            }
 
-            $cv->send( $_[1] );
+    @box = ([ @range[0,1] ], [ @range[2,3] ]);
+    $self->query_collection(
+        'ads_byarea',
+        \%q,
+        {
+            limit => 10,
+        },
+        AE::cv {
+            my @ads = $_[0]->recv;
+            $cv->send(\@ads);
         }
     );
 }

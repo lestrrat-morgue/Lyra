@@ -22,37 +22,43 @@ sub deploy {
         {
             title => 'オペラシティ',
             content => '最寄り駅は初台です',
-            location => \q|GeomFromText('POINT(139.685945 35.683616)')|,
+            location => [ 139.685945, 35.683616 ],
         },
         {
             title => 'NTT東日本',
             content => '最寄り駅は初台です',
-            location => \q|GeomFromText('POINT(139.678481 35.689265)')|,
+            location => [ 139.678481, 35.689265 ],
         },
         {
             title => '幡ヶ谷駅',
             content => '初台のとなりです',
-            location => \q|GeomFromText('POINT(139.674506 35.678603)')|,
+            location => [ 139.674506, 35.678603 ],
         },
         {
             title => '明治大学',
             content => '最寄り駅は明大前です',
-            location => \q|GeomFromText('POINT(139.641874 35.675566)')|,
+            location => [ 139.641874, 35.675566 ],
         },
         {
             title => '渋谷駅',
             content => '南口の使いにくさは異常です',
-            location => \q|GeomFromText('POINT(139.703946 35.657775)')|,
+            location => [ 139.703946, 35.657775 ],
         },
         {
             title => '三軒茶屋駅',
             content => 'こちらのハナマサの魚は結構質がいいですね',
-            location => \q|GeomFromText('POINT(139.700174 35.656826)')|,
+            location => [ 139.700174, 35.656826 ],
         },
     );
 
-    my $collection = $mongodb->get_database('lyra')->get_collection('ads_byarea');
+    my $collection = $mongodb
+        ->get_database('lyra')
+        ->get_collection('ads_byarea')
+    ;
+
+    $collection->remove();
     $collection->batch_insert( \@ads );
+    $collection->ensure_index( { location => "2d" } );
 }
 
 __PACKAGE__->meta->make_immutable();

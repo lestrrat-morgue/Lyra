@@ -10,6 +10,7 @@ has port     => (is => 'ro', isa => 'Int', default => 27017);
 has username => (is => 'ro', isa => 'Str');
 has password => (is => 'ro', isa => 'Str');
 has data_source => (is => 'ro', isa => 'Str');
+has drop     => (is => 'ro', isa => 'Bool', default => 0);
 
 sub run {
     my $self = shift;
@@ -18,6 +19,13 @@ sub run {
         host => $self->hostname,
         port => $self->port
     );
+
+    if ($self->drop) {
+        foreach my $dbname ($mongodb->database_names) {
+            my $db = $mongodb->get_database($dbname);
+            $db->drop;
+        }
+    }
 
     if (my $data_source = $self->data_source) {
         Class::MOP::load_class( $data_source );

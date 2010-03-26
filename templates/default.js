@@ -1,8 +1,8 @@
 document.writeln('<ul>');
 ? my $uri = shift;
 ? for my $ad (@_) { # id, title, content
-?   $uri->query_form( rid => $ad->[3], ad => $ad->[0] );
-document.writeln('<li><a href="<?= $uri ?>" target="_blank"><?= $ad->[1] ?></a> <?= $ad->[2] ?></li>');
+?   $uri->query_form( ad => $ad->{id} );
+document.writeln('<li><a href="<?= $uri ?>" target="_blank"><?= Encode::encode_utf8($ad->{title}) ?></a> <?= Encode::encode_utf8($ad->{content}) ?></li>');
 ? }
 document.writeln('</ul>');
 

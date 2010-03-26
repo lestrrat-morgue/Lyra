@@ -16,7 +16,19 @@ has click_uri => (
     required => 1,
 );
 
-has dsn => (
+has hostname => (
+    is => 'ro',
+    isa => 'Str',
+    default => '127.0.0.1',
+);
+
+has port => (
+    is => 'ro',
+    isa => 'Int',
+    default => 27017
+);
+
+has dbname => (
     is => 'ro',
     isa => 'Str',
     required => 1,
@@ -98,21 +110,26 @@ sub build_app {
     my $request_log = $self->build_log( 'request' );
     my $impression_log = $self->build_log( 'impression' );
 
-    my $dbh = AnyEvent::DBI->new(
-        $self->dsn,
-        $self->user,
-        $self->password,
+    my $cv = AE::cv;
+    my $dbh = AnyEvent::MongoDB->new(
+        host => $self->hostname,
+        port => $self->port,
         exec_server => 1,
-        RaiseError => 1,
-        AutoCommit => 1,
+        on_connect => sub {
+            my $db = shift;
+            $cv->send( 
+                Lyra::Server::AdEngine::ByArea->new(
+                    db => $db,
+                    click_uri => $self->click_uri,
+                    templates_dir => './templates',
+                    request_log_storage => $request_log,
+                    impression_log_storage => $impression_log,
+                )->psgi_app
+            );
+        }
     );
-    Lyra::Server::AdEngine::ByArea->new(
-        dbh => $dbh,
-        click_uri => $self->click_uri,
-        templates_dir => './templates',
-        request_log_storage => $request_log,
-        impression_log_storage => $impression_log,
-    )->psgi_app;
+
+    return $cv->recv;
 }
 
 __PACKAGE__->meta->make_immutable();
