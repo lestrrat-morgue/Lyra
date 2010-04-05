@@ -49,6 +49,9 @@ sub req_query {
    }
 
    my $cursor = $collection->query(@args);
+   if (@args > 2) {
+        $cursor = $cursor->fields($args[2]);
+    }
    [1, [$cursor->all]]
 }
 

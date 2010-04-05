@@ -130,12 +130,17 @@ my %q = (
 sub load_ad {
     my ($self, $cv, @range) = @_;
 
-    @box = ([ @range[0,1] ], [ @range[2,3] ]);
+    @box = ([@range[0,1]], [@range[2,3]]);
     $self->query_collection(
         'ads_byarea',
         \%q,
         {
             limit => 10,
+        },
+        {
+            id => 1,
+            title => 1,
+            content => 1,
         },
         AE::cv {
             my @ads = $_[0]->recv;
